@@ -38,8 +38,10 @@ class NN_definer:
 
     def fit_model(self,data):
 
-        predictors = data.drop(["target",],axis=1)#.as_matrix()
+        predictors = data.drop(["target"],axis=1)#.as_matrix()
         target = to_categorical(data.target)
+
+        print(predictors)
 
         self.model.fit(predictors,target)
         print("TEST _wwwww_______")

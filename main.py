@@ -35,11 +35,11 @@ if __name__ == '__main__':
 #samples.import_flat_single_sample("00000e74ad")
 
 
-testlist= ["00000e74ad","c00a5bd72f","f31a3199d0"]
+#testlist= ["00000e74ad","c00a5bd72f","f31a3199d0"]
 
-samples.import_list_of_flat_samples(testlist)
+#samples.import_list_of_flat_samples(testlist)
 
-samples.import_many_flat_samples(0, 3)
+#samples.import_many_flat_samples(0, 3)
 
 
 df_data= samples.import_many_flat_samples_add_targets(10, 100)
