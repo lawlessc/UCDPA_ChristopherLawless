@@ -6,6 +6,8 @@ import import_ligo_samples as samples
 import import_targets as tg
 #import kaggle_download as kg
 
+import NN_definer as nnd
+
 import exploratory_analysis as ex
 
 
@@ -45,3 +47,12 @@ samples.import_many_flat_samples_add_targets(0, 3)
 #ex.analysis_of_targets()
 
 #kg.initialize('g2net-gravitational-wave-detection')
+
+#neuralnet_d=  nnd.NN_definer
+
+neuralnet_d = nnd.NN_definer()
+
+neuralnet_d.specify_model()
+
+
+

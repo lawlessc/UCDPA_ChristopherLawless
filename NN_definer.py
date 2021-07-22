@@ -17,7 +17,7 @@ class NN_definer:
     def load_model(self, model_name):
         self.model = load_model(model_name)
 
-    def specify_model(self,predictors):
+    def specify_model(self):
         #predictor columns, only one is need , it outputs 1 or 0
        # n_cols = predictors                     #The inpust shape is set to the number of datapoints persample
         self.model.add(Dense(50,activation="relu",input_shape=(12287,)))
