@@ -42,7 +42,7 @@ samples.import_list_of_flat_samples(testlist)
 samples.import_many_flat_samples(0, 3)
 
 
-samples.import_many_flat_samples_add_targets(0, 3)
+df_data= samples.import_many_flat_samples_add_targets(10, 100)
 
 #ex.analysis_of_targets()
 
@@ -54,5 +54,6 @@ neuralnet_d = nnd.NN_definer()
 
 neuralnet_d.specify_model()
 
+neuralnet_d.compile_model()
 
-
+neuralnet_d.fit_model(df_data)

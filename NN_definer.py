@@ -25,22 +25,24 @@ class NN_definer:
         self.model.add(Dense(32,activation="relu"))
 
         self.model.add(Dense(1,activation="softmax"))
+        print("TEST ______________")
 
 
 
     def compile_model(self):
         self.model.compile(optimizer='adam', loss='mean_squared_error')
+        print("TEST _eeeee______")
         #self.model.compile(optimizer='adam', loss='categorical_crossentropy',metrics=["accuracy"])
         #self.model.compile(optimizer="sgd", loss="categorical_crossentropy", metrics=["accuracy"])
 
 
     def fit_model(self,data):
 
-        predictors = data.drop(["target"],axis=1).as_matrix()
+        predictors = data.drop(["target",],axis=1)#.as_matrix()
         target = to_categorical(data.target)
 
         self.model.fit(predictors,target)
-
+        print("TEST _wwwww_______")
         early_stopping_monitor= EarlyStopping(patience=2)
         #self.model.fit(predictors,target,validation_split = 0.3,nb_epoch=20
         # ,callbacks=[early_stopping_monitor])
