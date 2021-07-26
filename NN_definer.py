@@ -25,17 +25,19 @@ class NN_definer:
 
         self.model.add(Dense(32,activation="relu"))
 
-        self.model.add(Dense(1,activation="softmax"))
+        #self.model.add(Dense(1,activation="softmax"))
+        self.model.add(Dense(1, activation="sigmoid"))
         print("compile Model")
-        self.model.compile(optimizer='adam', loss='mean_squared_error')
-        # self.model.compile(optimizer='adam', loss='categorical_crossentropy',metrics=["accuracy"])
+        self.model.compile(optimizer='adam', loss='binary_crossentropy')
+        # self.model.compile(optimizer='adam', loss='mean_squared_error',metrics=["accuracy"])
         # self.model.compile(optimizer="sgd", loss="categorical_crossentropy", metrics=["accuracy"])
 
 
 
     def verify_model_info(self):
         print("Loss: " + self.model.loss)
-       # print("Optimizer: " + self.optimizer)
+        print("Model Summary: " + self.model.summary())
+
 
 
 
@@ -47,7 +49,7 @@ class NN_definer:
 
         #print(predictors)
 
-        self.model.fit(predictors,target,validation_split= 0.3,nb_epoch=20)
+        self.model.fit(predictors,target)
 
         early_stopping_monitor= EarlyStopping(patience=2)
         #self.model.fit(predictors,target,validation_split = 0.3,nb_epoch=20

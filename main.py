@@ -51,5 +51,6 @@ neuralnet_d = nnd.NN_definer()
 
 neuralnet_d.specify_model()
 
+neuralnet_d.verify_model_info()
 
 neuralnet_d.fit_model(df_data)
