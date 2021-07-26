@@ -18,38 +18,42 @@ class NN_definer:
         self.model = load_model(model_name)
 
     def specify_model(self):
+        print("Specify Model")
         #predictor columns, only one is need , it outputs 1 or 0
        # n_cols = predictors                     #The inpust shape is set to the number of datapoints persample
-        self.model.add(Dense(50,activation="relu",input_shape=(12287,)))
+        self.model.add(Dense(12288,activation="relu",input_shape=(12288,)))
 
         self.model.add(Dense(32,activation="relu"))
 
         self.model.add(Dense(1,activation="softmax"))
-        print("TEST ______________")
-
-
-
-    def compile_model(self):
+        print("compile Model")
         self.model.compile(optimizer='adam', loss='mean_squared_error')
-        print("TEST _eeeee______")
-        #self.model.compile(optimizer='adam', loss='categorical_crossentropy',metrics=["accuracy"])
-        #self.model.compile(optimizer="sgd", loss="categorical_crossentropy", metrics=["accuracy"])
+        # self.model.compile(optimizer='adam', loss='categorical_crossentropy',metrics=["accuracy"])
+        # self.model.compile(optimizer="sgd", loss="categorical_crossentropy", metrics=["accuracy"])
+
+
+
+    def verify_model_info(self):
+        print("Loss: " + self.model.loss)
+       # print("Optimizer: " + self.optimizer)
+
 
 
     def fit_model(self,data):
-
+        print("fit model")
+        self.verify_model_info()
         predictors = data.drop(["target"],axis=1)#.as_matrix()
         target = to_categorical(data.target)
 
-        print(predictors)
+        #print(predictors)
 
-        self.model.fit(predictors,target)
-        print("TEST _wwwww_______")
+        self.model.fit(predictors,target,validation_split= 0.3,nb_epoch=20)
+
         early_stopping_monitor= EarlyStopping(patience=2)
         #self.model.fit(predictors,target,validation_split = 0.3,nb_epoch=20
         # ,callbacks=[early_stopping_monitor])
 
-        print("Loss: " + self.model.loss )
+
 
     def save_model(self):
         current = datetime.now()

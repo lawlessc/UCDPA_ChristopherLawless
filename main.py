@@ -1,13 +1,11 @@
 import pandas as pd
 import  numpy
-
 import import_ligo_samples
 import import_ligo_samples as samples
 import import_targets as tg
 #import kaggle_download as kg
 
 import NN_definer as nnd
-
 import exploratory_analysis as ex
 
 
@@ -20,7 +18,6 @@ import exploratory_analysis as ex
 def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
     print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -42,7 +39,7 @@ if __name__ == '__main__':
 #samples.import_many_flat_samples(0, 3)
 
 
-df_data= samples.import_many_flat_samples_add_targets(10, 100)
+df_data= samples.import_many_flat_samples_add_targets(10, 1000)
 
 #ex.analysis_of_targets()
 
@@ -54,6 +51,5 @@ neuralnet_d = nnd.NN_definer()
 
 neuralnet_d.specify_model()
 
-neuralnet_d.compile_model()
 
 neuralnet_d.fit_model(df_data)
