@@ -32,16 +32,8 @@ def import_flat_single_sample(sample_name):
     #samples names are hex numbers in the targets file
     #The first 3 also represent the path characters represent
     testnpy = np.load(gp.get_path_training(sample_name))
-
-    testnpy_flat= testnpy.flatten()
-
-    #flatten to a single row
-    df = pd.DataFrame(testnpy_flat).T
-
-    #print(df)
-    #print(type(df))
-    #print(df.head())
-    return df
+             #This flattens and transposes a sample to a dataframe
+    return  pd.DataFrame(testnpy.flatten()).T
 
 #this takes a list of sample names and imports them
 def import_list_of_flat_samples(sample_name_list):
@@ -87,6 +79,8 @@ def import_many_flat_samples_add_targets(starting_number, ending_number):
     for entry in range(starting_number,ending_number):
         sample_name_list.append(targets_df["id"].values[entry])
         target_list.append(targets_df["target"].values[entry])
+
+        #print(str(targets_df["id"].values[entry])+" "+ str(targets_df["target"].values[entry]))
 
     #print(sample_name_list)
     samples_df = import_list_of_flat_samples(sample_name_list)

@@ -5,9 +5,13 @@ from keras.utils.np_utils import to_categorical
 from keras.models import load_model
 #from keras.optimizers import SGD
 from keras.callbacks import EarlyStopping
+from sklearn import preprocessing
+
+
 
 import matplotlib.pyplot as plt
 from datetime import datetime
+import visualisers as vs
 
 class NN_definer:
 
@@ -21,21 +25,20 @@ class NN_definer:
     def specify_model(self):
         print("Specify Model")
         #predictor columns, only one is need , it outputs 1 or 0
-       # n_cols = predictors                     #The inpust shape is set to the number of datapoints persample
-        self.model.add(Dense(12288,activation="sigmoid",input_shape=(12288,)))
-        self.model.add(Dense(32,activation="relu"))
+       # n_cols = predictors                     #The input shape is set to the number of datapoints persample
+        self.model.add(Dense(11059,activation="relu",input_shape=(12288,)))
+        self.model.add(Dense(5529,activation="relu"))
+        self.model.add(Dense(1843, activation="relu"))
+        #self.model.add(Dense(10, activation="relu"))
         #self.model.add(Dense(1,activation="softmax"))
-        self.model.add(Dense(2, activation="sigmoid"))
+        self.model.add(Dense(1, activation="sigmoid"))
         print("compile Model")
-        self.model.compile(optimizer='sgd', loss='categorical_crossentropy', metrics= ["accuracy"])
+        self.model.compile(optimizer='adam', loss='binary_crossentropy', metrics= ["accuracy"])
         # self.model.compile(optimizer='adam', loss='mean_squared_error',metrics=["accuracy"])
         # self.model.compile(optimizer="sgd", loss="categorical_crossentropy", metrics=["accuracy"])
 
 
 
-    def verify_model_info(self):
-        print("Loss: " + self.model.loss)
-        self.model.summary()
 
 
 
@@ -43,16 +46,20 @@ class NN_definer:
     def fit_model(self,data):
         print("fit model")
         self.verify_model_info()
-        predictors = data.drop(["target"],axis=1)#.as_matrix()
-        target = to_categorical(data.target)
+        predictors = data.drop(["target"],axis=1).values#.as_matrix()
+      #  targets = to_categorical(data.target)
 
+        print(data.target.values)
         #print(predictors)
 
-        self.model.fit(predictors,target, epochs=10,validation_split = 0.3)
+        mt =self.model.fit(predictors,data.target.values, epochs=40,validation_split = 0.36, use_multiprocessing=True)
 
-        early_stopping_monitor= EarlyStopping(patience=2)
+        #early_stopping_monitor= EarlyStopping(patience=2)
         #self.model.fit(predictors,target,validation_split = 0.3,nb_epoch=20
         # ,callbacks=[early_stopping_monitor])
+        mlist = [mt]
+       # self.validation_plot(mlist)
+        vs.validation_plot(self=vs,model_list=mlist)
 
 
 
@@ -69,8 +76,9 @@ class NN_definer:
            #self.model.compile(optimizer=optimizer, loss = "categorocal_crossentropy")
            self.model.fit(predictors,target)
 
+    def verify_model_info(self):
+        print("Loss: " + self.model.loss)
+        self.model.summary()
 
-    def validation_view(self,model_list):
-        plt.xlabel('Epochs')
-        plt.ylabel('Validation score')
-        plt.show()
+
+

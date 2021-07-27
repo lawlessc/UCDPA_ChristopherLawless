@@ -39,11 +39,11 @@ if __name__ == '__main__':
 #samples.import_many_flat_samples(0, 3)
 
 
-df_data= samples.import_many_flat_samples_add_targets(1, 6000)
+df_data= samples.import_many_flat_samples_add_targets(0, 2000)
 
 #ex.analysis_of_targets()
 
-#kg.initialize('g2net-gravitational-wave-detection')
+
 
 #neuralnet_d=  nnd.NN_definer
 
