@@ -6,6 +6,7 @@ from keras.models import load_model
 #from keras.optimizers import SGD
 from keras.callbacks import EarlyStopping
 
+import matplotlib.pyplot as plt
 from datetime import datetime
 
 class NN_definer:
@@ -21,14 +22,12 @@ class NN_definer:
         print("Specify Model")
         #predictor columns, only one is need , it outputs 1 or 0
        # n_cols = predictors                     #The inpust shape is set to the number of datapoints persample
-        self.model.add(Dense(12288,activation="relu",input_shape=(12288,)))
-
+        self.model.add(Dense(12288,activation="sigmoid",input_shape=(12288,)))
         self.model.add(Dense(32,activation="relu"))
-
         #self.model.add(Dense(1,activation="softmax"))
-        self.model.add(Dense(1, activation="sigmoid"))
+        self.model.add(Dense(2, activation="sigmoid"))
         print("compile Model")
-        self.model.compile(optimizer='adam', loss='binary_crossentropy')
+        self.model.compile(optimizer='sgd', loss='categorical_crossentropy', metrics= ["accuracy"])
         # self.model.compile(optimizer='adam', loss='mean_squared_error',metrics=["accuracy"])
         # self.model.compile(optimizer="sgd", loss="categorical_crossentropy", metrics=["accuracy"])
 
@@ -36,7 +35,7 @@ class NN_definer:
 
     def verify_model_info(self):
         print("Loss: " + self.model.loss)
-        print("Model Summary: " + self.model.summary())
+        self.model.summary()
 
 
 
@@ -49,7 +48,7 @@ class NN_definer:
 
         #print(predictors)
 
-        self.model.fit(predictors,target)
+        self.model.fit(predictors,target, epochs=10,validation_split = 0.3)
 
         early_stopping_monitor= EarlyStopping(patience=2)
         #self.model.fit(predictors,target,validation_split = 0.3,nb_epoch=20
@@ -69,3 +68,9 @@ class NN_definer:
            #optimizer = SGD(lr=lr)
            #self.model.compile(optimizer=optimizer, loss = "categorocal_crossentropy")
            self.model.fit(predictors,target)
+
+
+    def validation_view(self,model_list):
+        plt.xlabel('Epochs')
+        plt.ylabel('Validation score')
+        plt.show()

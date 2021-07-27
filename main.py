@@ -39,7 +39,7 @@ if __name__ == '__main__':
 #samples.import_many_flat_samples(0, 3)
 
 
-df_data= samples.import_many_flat_samples_add_targets(10, 1000)
+df_data= samples.import_many_flat_samples_add_targets(1, 6000)
 
 #ex.analysis_of_targets()
 

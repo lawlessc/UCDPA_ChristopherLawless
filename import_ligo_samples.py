@@ -76,6 +76,7 @@ def import_many_flat_samples(starting_number, ending_number):
 
 
 def import_many_flat_samples_add_targets(starting_number, ending_number):
+    print("Importing many samples")
     targets_df = tg.import_targets()
     #print(targets_df.head())
 
