@@ -15,7 +15,7 @@ def analysis_of_data():
 
 
 def analysis_of_targets():
-     df =tg.import_targets()
+     df =tg.import_training_targets()
 
      print(df.shape)
      print(df.columns)

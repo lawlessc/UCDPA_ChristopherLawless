@@ -7,6 +7,9 @@ from keras.models import load_model
 from keras.callbacks import EarlyStopping
 from sklearn import preprocessing
 
+from keras.layers import Conv1D
+from keras.layers import Conv2D
+from keras.layers import Conv2D
 
 
 import matplotlib.pyplot as plt
@@ -24,42 +27,37 @@ class NN_definer:
 
     def specify_model(self):
         print("Specify Model")
-        #predictor columns, only one is need , it outputs 1 or 0
-       # n_cols = predictors                     #The input shape is set to the number of datapoints persample
-        self.model.add(Dense(11059,activation="relu",input_shape=(12288,)))
-        self.model.add(Dense(5529,activation="relu"))
-        self.model.add(Dense(1843, activation="relu"))
-        #self.model.add(Dense(10, activation="relu"))
-        #self.model.add(Dense(1,activation="softmax"))
-        self.model.add(Dense(1, activation="sigmoid"))
+
+        self.model.add(Dense(3,activation="relu",input_shape=(12288,)))
+        self.model.add(Dense(3, activation="relu"))
+        self.model.add(Dense(2, activation="softmax"))
         print("compile Model")
-        self.model.compile(optimizer='adam', loss='binary_crossentropy', metrics= ["accuracy"])
+        self.model.compile(optimizer='adam', loss='categorical_crossentropy', metrics= ["accuracy"])
         # self.model.compile(optimizer='adam', loss='mean_squared_error',metrics=["accuracy"])
         # self.model.compile(optimizer="sgd", loss="categorical_crossentropy", metrics=["accuracy"])
-
-
-
-
 
 
 
     def fit_model(self,data):
         print("fit model")
         self.verify_model_info()
-        predictors = data.drop(["target"],axis=1).values#.as_matrix()
-      #  targets = to_categorical(data.target)
+        predictors = data.drop(["target"],axis=1)#.as_matrix()
+        targets = to_categorical(data.target)
 
-        print(data.target.values)
-        #print(predictors)
+        #print(data.target.values)
+        #print(predictors.shape[1])
 
-        mt =self.model.fit(predictors,data.target.values, epochs=40,validation_split = 0.36, use_multiprocessing=True)
+        mt =self.model.fit(predictors,targets, epochs=10,validation_split = 0.36, use_multiprocessing=True)
 
         #early_stopping_monitor= EarlyStopping(patience=2)
         #self.model.fit(predictors,target,validation_split = 0.3,nb_epoch=20
         # ,callbacks=[early_stopping_monitor])
         mlist = [mt]
        # self.validation_plot(mlist)
+        self.save_model()
         vs.validation_plot(self=vs,model_list=mlist)
+        vs.accuracy_plot(self=vs, model_list=mlist)
+        self.save_model()
 
 
 
@@ -82,3 +80,7 @@ class NN_definer:
 
 
 
+    def make_prediction_with(self,model_name,data_to_predict_with):
+        loaded_model = load_model(model_name)
+        predictions = loaded_model.predict(data_to_predict_with)
+        probability_true = predictions[:,1]

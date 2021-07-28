@@ -28,39 +28,47 @@ def import_single_sample(sample_name):
     testnpy = np.load(gp.get_path_training(sample_name))
     df = pd.DataFrame(testnpy)
 
-def import_flat_single_sample(sample_name):
+def import_flat_training_sample(sample_name):
     #samples names are hex numbers in the targets file
     #The first 3 also represent the path characters represent
     testnpy = np.load(gp.get_path_training(sample_name))
-             #This flattens and transposes a sample to a dataframe
-    return  pd.DataFrame(testnpy.flatten()).T
+             #This flattens a sample numpy from 3 rows to one row
+    flat = testnpy.flatten()
+    return flat
+
+def import_flat_testing_sample(sample_name):
+    #samples names are hex numbers in the targets file
+    #The first 3 also represent the path characters represent
+    testnpy = np.load(gp.get_path_testing(sample_name))
+             #This flattens a sample numpy from 3 rows to one row
+    flat = testnpy.flatten()
+    return flat
 
 #this takes a list of sample names and imports them
-def import_list_of_flat_samples(sample_name_list):
+def import_list_of_flat_training_samples(sample_name_list):
     #We create an empty dataframe
+    numpy_arrays_list = []
     df = pd.DataFrame()
 
     for sample in sample_name_list:
-        df = df.append(import_flat_single_sample(sample))
+        #print("...")
+        numpy_arrays_list.append(import_flat_training_sample(sample))
 
-    #print(df)
-    #print(type(df))
-    #print(df.head())
+    #this appends all the rows of numpy arrays list to the dataframe
+    df = df.append(pd.DataFrame(numpy_arrays_list))
+
     return df
 
 #by selecting a starting point and an end point the user can select a range of samples
-def import_many_flat_samples(starting_number, ending_number):
-    targets_df = tg.import_targets()
-    #print(targets_df.head())
-
+def import_number_of_flat_training_samples(starting_number, ending_number):
+    targets_df = tg.import_training_targets()
     sample_name_list = []
 
     # get the list of sample names for the range
     for entry in range(starting_number,ending_number):
         sample_name_list.append(targets_df["id"].values[entry])
-
     #print(sample_name_list)
-    return import_list_of_flat_samples(sample_name_list)
+    return import_list_of_flat_training_samples(sample_name_list)
 
 
 
@@ -69,12 +77,13 @@ def import_many_flat_samples(starting_number, ending_number):
 
 def import_many_flat_samples_add_targets(starting_number, ending_number):
     print("Importing many samples")
-    targets_df = tg.import_targets()
+    targets_df = tg.import_training_targets()
     #print(targets_df.head())
 
     sample_name_list = []
     target_list = []
 
+    print("appending targets")
     #get the list of sample names for the range
     for entry in range(starting_number,ending_number):
         sample_name_list.append(targets_df["id"].values[entry])
@@ -82,8 +91,9 @@ def import_many_flat_samples_add_targets(starting_number, ending_number):
 
         #print(str(targets_df["id"].values[entry])+" "+ str(targets_df["target"].values[entry]))
 
-    #print(sample_name_list)
-    samples_df = import_list_of_flat_samples(sample_name_list)
+
+    print("import_list_of_flat_samples")
+    samples_df = import_list_of_flat_training_samples(sample_name_list)
     samples_df["target"] = target_list
     #print(samples_df)
     return samples_df
@@ -91,7 +101,7 @@ def import_many_flat_samples_add_targets(starting_number, ending_number):
 
 
 def import_single_samples_of_number(number):
-    targets_df = tg.import_targets()
+    targets_df = tg.import_training_targets()
     return targets_df["id"].values[number]
 
 
