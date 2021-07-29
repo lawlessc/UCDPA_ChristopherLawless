@@ -56,8 +56,30 @@ def import_list_of_flat_training_samples(sample_name_list):
 
     #this appends all the rows of numpy arrays list to the dataframe
     df = df.append(pd.DataFrame(numpy_arrays_list))
-
     return df
+
+def import_list_of_flat_testing_samples(sample_name_list):
+    #We create an empty dataframe
+    numpy_arrays_list = []
+    df = pd.DataFrame()
+
+    for sample in sample_name_list:
+        numpy_arrays_list.append(import_flat_testing_sample(sample))
+    #this appends all the rows of numpy arrays list to the dataframe
+    df = df.append(pd.DataFrame(numpy_arrays_list))
+    return df
+
+
+def import_number_of_flat_testing_samples(starting_number, ending_number):
+    targets_df = tg.import_training_targets()
+    sample_name_list = []
+
+    # get the list of sample names for the range
+    for entry in range(starting_number,ending_number):
+        sample_name_list.append(targets_df["id"].values[entry])
+    #print(sample_name_list)
+    return import_list_of_flat_testing_samples(sample_name_list)
+
 
 #by selecting a starting point and an end point the user can select a range of samples
 def import_number_of_flat_training_samples(starting_number, ending_number):
