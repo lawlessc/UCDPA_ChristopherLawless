@@ -39,18 +39,33 @@ if __name__ == '__main__':
 #samples.import_many_flat_samples(0, 3)
 
 
-df_data= samples.import_many_flat_samples_add_targets(0, 1600)
+
 
 #ex.analysis_of_targets()
 
-
-
-#neuralnet_d=  nnd.NN_definer
-
 neuralnet_d = nnd.NN_definer()
 
-neuralnet_d.specify_model()
+#training
 
+df_data= samples.import_many_flat_samples_add_targets(0, 100000)
+neuralnet_d.specify_model(df_data)
 neuralnet_d.verify_model_info()
+#neuralnet_d.fit_model(df_data)
 
-neuralnet_d.fit_model(df_data)
+
+#Testing
+#df_test_data =samples.import_number_of_flat_testing_samples(4,100)
+
+
+
+#print(df_test_data)
+
+
+#neuralnet_d.make_prediction_with("29_07_2021_21_04_16.h5",df_test_data)
+
+
+
+
+
+
+
