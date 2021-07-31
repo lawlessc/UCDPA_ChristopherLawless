@@ -17,7 +17,7 @@ import exploratory_analysis as ex
 
 def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+    print(f'Made by Christopher Lawless July 2021')  # Press Ctrl+F8 to toggle the breakpoint.
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
@@ -47,19 +47,18 @@ neuralnet_d = nnd.NN_definer()
 
 #training
 
-df_data= samples.import_many_flat_samples_add_targets(0, 16000)
-neuralnet_d.specify_model(df_data)
+df_data= samples.import_many_flat_samples_add_targets(0, 1600)
+df_data.append(samples.import_many_flat_samples_add_targets(2000, 3000))
+df_data.append(samples.import_many_flat_samples_add_targets(5000, 6000))
+df_data.append(samples.import_many_flat_samples_add_targets(30000, 35000))
+df_data.append(samples.import_many_flat_samples_add_targets(500000, 500100))
 
+neuralnet_d.specify_model(df_data)
 
 
 #Testing
 #df_test_data =samples.import_number_of_flat_testing_samples(4,100)
-
-
-
 #print(df_test_data)
-
-
 #neuralnet_d.make_prediction_with("29_07_2021_21_04_16.h5",df_test_data)
 
 

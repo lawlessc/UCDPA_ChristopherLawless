@@ -1,18 +1,18 @@
 import keras
 import pandas as pd
-from keras.layers import Dense
+from keras.layers import Dense, Dropout
 from keras.layers.advanced_activations import LeakyReLU ,PReLU,ELU
 from keras.utils.np_utils import to_categorical
 from keras.models import load_model ,Sequential
 from keras.optimizers import SGD ,Adam
-
+from keras.constraints import maxnorm
 from keras.callbacks import EarlyStopping
 from sklearn import preprocessing
 
 from keras.layers import Conv1D
 from keras.layers import Conv2D
 from keras.layers import Conv2D
-
+#Made by Christopher Lawless July 2021
 
 import matplotlib.pyplot as plt
 from datetime import datetime
@@ -29,18 +29,25 @@ class NN_definer:
 
     def specify_model(self,data):
         print("Specify Model")
-        my_optimizer = SGD(learning_rate=0.0000001,momentum=0.3, nesterov=True)
+        my_optimizer = SGD(learning_rate=0.00001,momentum=0.99, nesterov=True)
         #my_optimizer = Adam(learning_rate=0.0000333)
 
-        #self.model.add(Dense(3,activation="relu", input_shape=(data.shape[1] - 1,)))
-        self.model.add(LeakyReLU(3,input_shape=(data.shape[1] - 1,)))
-        #self.model.add(ELU(12289,input_shape=(data.shape[1]-1,)))
-       # self.model.add(Dense(12289, activation="relu",input_shape=(data.shape[1]-1,)))
-       # self.model.add(LeakyReLU(4096))
-        self.model.add(LeakyReLU(3))
+        self.model.add(Dropout(0.9,  input_shape=(data.shape[1] - 1,)))
+        self.model.add(Dense(3,activation="relu", input_shape=(data.shape[1] - 1,),kernel_constraint=maxnorm(3)))
+        #self.model.add(LeakyReLU(50,input_shape=(data.shape[1] - 1)))
+        #self.model.add(LeakyReLU(4))
+        #self.model.add(LeakyReLU(60, input_shape=(data.shape[1] - 1,)))
+        self.model.add(Dropout(0.1))
+        self.model.add(Dense(2, activation="relu", kernel_constraint=maxnorm(3)))
+        self.model.add(Dropout(0.1))
+        #self.model.add(ELU(3,input_shape=(data.shape[1]-1,)))
+        #self.model.add(Dense(12289, activation="relu",input_shape=(data.shape[1]-1,)))
+        #self.model.add(LeakyReLU(4096))
+        self.model.add(LeakyReLU(2))
         #self.model.add(Dense(3, activation="sigmoid"))
-    #    self.model.add(Dense(3, activation="relu"))
-       # self.model.add(Dense(42, activation="relu"))
+        #self.model.add(Dense(3, activation="relu", kernel_constraint=maxnorm(3)))
+        #self.model.add(Dense(42, activation="relu"))
+
         self.model.add(Dense(1, activation="sigmoid"))
 
 
@@ -48,10 +55,11 @@ class NN_definer:
 
 
         print("compile Model")
-        self.model.compile(optimizer=my_optimizer, loss='binary_crossentropy', metrics= ["accuracy"])
+        self.model.compile(optimizer=my_optimizer, loss='binary_crossentropy',metrics= ["accuracy"])
         # self.model.compile(optimizer='adam', loss='mean_squared_error',metrics=["accuracy"])
         # self.model.compile(optimizer="sgd", loss="categorical_crossentropy", metrics=["accuracy"])
         self.fit_model(data)
+        #self.validate_model(data)
 
 
     def fit_model(self,data):
@@ -62,13 +70,27 @@ class NN_definer:
         print(data.target.values)
         print(predictors)
 
-        mt =self.model.fit(predictors,data.target.values, epochs=5000,validation_split = 0.10)#, use_multiprocessing=True) This seems to be only for training large pools of models
+        mt =self.model.fit(predictors,data.target.values, epochs=1000 , batch_size=10,validation_split = 0.20)#, use_multiprocessing=True) This seems to be only for training large pools of models
 
         #early_stopping_monitor= EarlyStopping(patience=2)
         #self.model.fit(predictors,target,validation_split = 0.3,nb_epoch=20
         # ,callbacks=[early_stopping_monitor])
         mlist = [mt]
         vs.validation_plot(self=vs,model_list=mlist)
+        vs.accuracy_plot(self=vs, model_list=mlist)
+        self.save_model()
+
+    def validate_model(self, data):
+        print("fit model")
+        predictors = data.drop(["target"], axis=1).values  # .as_matrix()
+        # targets = to_categorical(data.target)
+
+        print(data.target.values)
+        print(predictors)
+
+        mt = self.model.fit(predictors, data.target.values, epochs=500, validation_split=1)
+        mlist = [mt]
+        vs.validation_plot(self=vs, model_list=mlist)
         vs.accuracy_plot(self=vs, model_list=mlist)
         self.save_model()
 
