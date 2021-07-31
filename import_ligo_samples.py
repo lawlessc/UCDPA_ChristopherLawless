@@ -55,7 +55,7 @@ def import_list_of_flat_training_samples(sample_name_list):
 
     #this appends all the rows of numpy arrays list to the dataframe
     df = df.append(pd.DataFrame(numpy_arrays_list))
-    return df
+    return normalise_data(df)
 
 def import_list_of_flat_testing_samples(sample_name_list):
     #We create an empty dataframe
@@ -66,7 +66,7 @@ def import_list_of_flat_testing_samples(sample_name_list):
         numpy_arrays_list.append(import_flat_testing_sample(sample))
     #this appends all the rows of numpy arrays list to the dataframe
     df = df.append(pd.DataFrame(numpy_arrays_list))
-    return df
+    return normalise_data(df)
 
 
 def import_number_of_flat_testing_samples(starting_number, ending_number):
@@ -129,7 +129,7 @@ def import_single_samples_of_number(number):
 def normalise_data(data):
     print("normalise data")
     #https://www.kaggle.com/parasjindal96/how-to-normalize-dataframe-pandas
-    data_plus_10= data+10
+    #data_plus_10= data+10
     dataf = ((data - data.min()) / (data.max() - data.min())) * 1
     return dataf
 

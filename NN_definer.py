@@ -1,7 +1,7 @@
 import keras
 import pandas as pd
 from keras.layers import Dense
-from keras.layers.advanced_activations import LeakyReLU
+from keras.layers.advanced_activations import LeakyReLU ,PReLU,ELU
 from keras.utils.np_utils import to_categorical
 from keras.models import load_model ,Sequential
 from keras.optimizers import SGD ,Adam
@@ -29,15 +29,22 @@ class NN_definer:
 
     def specify_model(self,data):
         print("Specify Model")
-        my_optimizer = SGD(learning_rate=.000001,momentum=1, nesterov=True)
-        #my_optimizer = Adam(learning_rate=0.001)
+        my_optimizer = SGD(learning_rate=0.0000001,momentum=0.3, nesterov=True)
+        #my_optimizer = Adam(learning_rate=0.0000333)
 
-        self.model.add(LeakyReLU(12288,input_shape=(data.shape[1]-1,)))
+        #self.model.add(Dense(3,activation="relu", input_shape=(data.shape[1] - 1,)))
+        self.model.add(LeakyReLU(3,input_shape=(data.shape[1] - 1,)))
+        #self.model.add(ELU(12289,input_shape=(data.shape[1]-1,)))
        # self.model.add(Dense(12289, activation="relu",input_shape=(data.shape[1]-1,)))
-        self.model.add(Dense(110, activation="relu"))
-        self.model.add(Dense(9, activation="relu"))
-        self.model.add(Dense(3, activation="relu"))
+       # self.model.add(LeakyReLU(4096))
+        self.model.add(LeakyReLU(3))
+        #self.model.add(Dense(3, activation="sigmoid"))
+    #    self.model.add(Dense(3, activation="relu"))
+       # self.model.add(Dense(42, activation="relu"))
         self.model.add(Dense(1, activation="sigmoid"))
+
+
+
 
 
         print("compile Model")
@@ -49,21 +56,18 @@ class NN_definer:
 
     def fit_model(self,data):
         print("fit model")
-        #self.verify_model_info()
         predictors = data.drop(["target"],axis=1).values#.as_matrix()
         targets = to_categorical(data.target)
 
-        #print(data.target.values)
-        #print(predictors.shape[1])
+        print(data.target.values)
+        print(predictors)
 
-        mt =self.model.fit(predictors,data.target.values, epochs=100,validation_split = 0.20)#, use_multiprocessing=True) This seems to be only for training large pools of models
+        mt =self.model.fit(predictors,data.target.values, epochs=5000,validation_split = 0.10)#, use_multiprocessing=True) This seems to be only for training large pools of models
 
         #early_stopping_monitor= EarlyStopping(patience=2)
         #self.model.fit(predictors,target,validation_split = 0.3,nb_epoch=20
         # ,callbacks=[early_stopping_monitor])
         mlist = [mt]
-       # self.validation_plot(mlist)
-       # self.save_model()
         vs.validation_plot(self=vs,model_list=mlist)
         vs.accuracy_plot(self=vs, model_list=mlist)
         self.save_model()
@@ -102,3 +106,24 @@ class NN_definer:
 
         for prediction in probability_true:
             print(prediction)
+
+
+    def retrain_model(self,model_name,data):
+        loaded_model = load_model(model_name)
+
+        predictors = data.drop(["target"], axis=1).values  # .as_matrix()
+        targets = to_categorical(data.target)
+
+        print(data.target.values)
+        print(predictors)
+
+        mt = self.model.fit(predictors, data.target.values, epochs=1000,
+                            validation_split=0.10)  # , use_multiprocessing=True) This seems to be only for training large pools of models
+
+        # early_stopping_monitor= EarlyStopping(patience=2)
+        # self.model.fit(predictors,target,validation_split = 0.3,nb_epoch=20
+        # ,callbacks=[early_stopping_monitor])
+        mlist = [mt]
+        vs.validation_plot(self=vs, model_list=mlist)
+        vs.accuracy_plot(self=vs, model_list=mlist)
+        self.save_model()

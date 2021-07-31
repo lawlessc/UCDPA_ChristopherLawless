@@ -47,10 +47,9 @@ neuralnet_d = nnd.NN_definer()
 
 #training
 
-df_data= samples.import_many_flat_samples_add_targets(0, 100000)
+df_data= samples.import_many_flat_samples_add_targets(0, 16000)
 neuralnet_d.specify_model(df_data)
-neuralnet_d.verify_model_info()
-#neuralnet_d.fit_model(df_data)
+
 
 
 #Testing
