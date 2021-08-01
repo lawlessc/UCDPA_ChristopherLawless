@@ -6,7 +6,7 @@ def validation_plot(self ,model_list):
 
     for model in model_list:
         plt.plot(model.history["loss"], 'r' ,  label="loss")
-        plt.plot(model.history["val_loss"] ,'b', label="validation")
+        plt.plot(model.history["val_loss"] ,'b', label="validation loss")
 
 
 
@@ -20,7 +20,7 @@ def accuracy_plot(self ,model_list):
 
     for model in model_list:
         plt.plot(model.history["accuracy"], 'r', label="accuracy")
-        plt.plot(model.history["val_accuracy"] ,'b',  label="validation")
+        plt.plot(model.history["val_accuracy"] ,'b',  label="validation accuracy")
 
 
     plt.xlabel('Epochs')

@@ -4,10 +4,8 @@ import import_ligo_samples
 import import_ligo_samples as samples
 import import_targets as tg
 #import kaggle_download as kg
-
-import NN_definer as nnd
 import exploratory_analysis as ex
-
+import HyperParameterOpto as tr
 
 # This is a sample Python script.
 
@@ -43,17 +41,23 @@ if __name__ == '__main__':
 
 #ex.analysis_of_targets()
 
-neuralnet_d = nnd.NN_definer()
+#neuralnet_d = nnd.NN_definer()
 
 #training
 
-df_data= samples.import_many_flat_samples_add_targets(0, 1600)
-df_data.append(samples.import_many_flat_samples_add_targets(2000, 3000))
-df_data.append(samples.import_many_flat_samples_add_targets(5000, 6000))
-df_data.append(samples.import_many_flat_samples_add_targets(30000, 35000))
-df_data.append(samples.import_many_flat_samples_add_targets(500000, 500100))
+data = []
 
-neuralnet_d.specify_model(df_data)
+data.append(samples.import_many_flat_samples_add_targets(0, 1600))
+data.append(samples.import_many_flat_samples_add_targets(2000, 3000))
+data.append(samples.import_many_flat_samples_add_targets(5000, 6000))
+data.append(samples.import_many_flat_samples_add_targets(30000, 35000))
+data.append(samples.import_many_flat_samples_add_targets(500000, 508000))
+data.append(samples.import_many_flat_samples_add_targets(70000, 71000))
+
+data.append(samples.import_many_flat_samples_add_targets(300000, 301000))
+data.append(samples.import_many_flat_samples_add_targets(200000, 210000))
+
+tr.train_network(data)
 
 
 #Testing

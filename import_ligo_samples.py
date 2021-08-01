@@ -130,7 +130,7 @@ def normalise_data(data):
     print("normalise data")
     #https://www.kaggle.com/parasjindal96/how-to-normalize-dataframe-pandas
     #data_plus_10= data+10
-    dataf = ((data - data.min()) / (data.max() - data.min())) * 1
-    return dataf
+    #dataf = ((data - data.min()) / (data.max() - data.min())) * 1
+    return data
 
 
