@@ -33,9 +33,9 @@ class hyper_paramenter_training:
 
 
 
-        batch_sizes  = [9,10,11,12,100,1000]
-        hidden_layers = [2]
-        hidden_layer_widths = [3,4,5,6]
+        batch_sizes  = [100,1000,3000]
+        hidden_layers = [3]
+        hidden_layer_widths = [4]
         optimizer_list = [my_optimizer]#,my_optimizer2,"adam",my_optimizer3,"sgd",my_optimizer4,my_optimizer5,my_optimizer6,my_optimizer7,my_optimizer8]
 
 
