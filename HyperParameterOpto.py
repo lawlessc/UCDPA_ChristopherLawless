@@ -22,7 +22,7 @@ class hyper_paramenter_training:
 
 
 
-        my_optimizer =  SGD(learning_rate=0.0000001,momentum=0.99, nesterov=True)
+        my_optimizer =  SGD(learning_rate=0.0001,momentum=0.99, nesterov=True)
         my_optimizer2 = SGD(learning_rate=0.0000001,momentum=0.99, nesterov=True)
         my_optimizer3 = SGD(learning_rate=0.000001, momentum=0.30, nesterov=False)
         my_optimizer4 = SGD(learning_rate=0.000001, momentum=0.30, nesterov=True)
@@ -33,9 +33,9 @@ class hyper_paramenter_training:
 
 
 
-        batch_sizes  = [100,1000,3000]
-        hidden_layers = [3]
-        hidden_layer_widths = [4]
+        batch_sizes  = [10,100]
+        hidden_layers = [1,2]
+        hidden_layer_widths = [16,32]
         optimizer_list = [my_optimizer]#,my_optimizer2,"adam",my_optimizer3,"sgd",my_optimizer4,my_optimizer5,my_optimizer6,my_optimizer7,my_optimizer8]
 
 
@@ -47,9 +47,9 @@ class hyper_paramenter_training:
                     for widths in hidden_layer_widths:
                         print("optimizer:" +str(index))
                         print("width:"+str(widths))
-                        print("layers:" + str(layers+1))
+                        print("layers:" + str(layers+1))#added a number to this to include
                         print("batch size:" + str(batch_size))
-                        model = self.neuralnet_d.define_model(data,layers,widths)
+                        model = self.neuralnet_d.define_model(data, layers, widths)
                         model = self.neuralnet_d.compile_model(model, optimizer)
                         history , model = self.neuralnet_d.fit_model(data, model, batch_size)
 

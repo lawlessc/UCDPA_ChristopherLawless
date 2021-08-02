@@ -24,20 +24,21 @@ class NN_definer:
     def load_model(self, model_name):
         return load_model(model_name)
 
-    def define_model(self, data, hidden_layers,hidden_layer_width):
+    def define_model(self, data, hidden_layers, hidden_layer_width):
         model = Sequential()
 
         print("Specify Model")
 
-        #model.add(Dropout(0.03,  input_shape=(data.shape[1] - 1,)))
-        #model.add(Dense(12289,activation="relu", input_shape=(data.shape[1] - 1,)))
-        model.add(LeakyReLU(hidden_layer_width,input_shape=(data.shape[1] - 1,)))
-        #model.add(Dense(hidden_layer_width, activation="relu",input_shape=(data.shape[1] - 1,)))
+        #model.add(Dropout(0.03,  input_shape=(data.shape[1] - 1,))) #This might overkill considering the dataset is already full of noise
+
+        #model.add(LeakyReLU(hidden_layer_width,input_shape=(data.shape[1] - 1,)))
+        model.add(Dense(hidden_layer_width, activation="relu",input_shape=(data.shape[1] - 1,)))
         #model.add(LeakyReLU(4))
         #model.add(LeakyReLU(60, input_shape=(data.shape[1] - 1,)))
         #model.add(Dropout(0.1))
-       # model.add(Dense(2, activation="relu", kernel_constraint=maxnorm(3)))
+       #model.add(Dense(2, activation="relu", kernel_constraint=maxnorm(3)))
         for x in range(hidden_layers):
+            print("layer added")
             model.add(LeakyReLU(hidden_layer_width))
             #model.add(Dense(hidden_layer_width, activation="relu"))
 
@@ -52,18 +53,49 @@ class NN_definer:
 
         return model
 
+    def create_model(self, hidden_layers, layer_widths, optimizer, winit):
+        model = Sequential()
 
-    def compile_model(self,model ,optimizer):
+        #print("Specify Model")
+
+        # model.add(Dropout(0.03,  input_shape=(data.shape[1] - 1,))) #This might overkill considering the dataset is already full of noise
+
+        model.add(LeakyReLU(layer_widths,input_shape=(12288,)))
+        #model.add(Dense(layer_widths, activation="relu", input_shape=(12288,) ,kernel_initializer=winit))
+        #model.add(Dense(layer_widths, activation="sigmoid",input_shape=(12288,) ,kernel_initializer=winit))
+
+        # model.add(LeakyReLU(4))
+        # model.add(LeakyReLU(60, input_shape=(data.shape[1] - 1,)))
+        # model.add(Dropout(0.1))
+        # model.add(Dense(2, activation="relu", kernel_constraint=maxnorm(3)))
+        for x in range(hidden_layers):
+            print("layer added")
+            model.add(LeakyReLU(layer_widths))
+            # model.add(Dense(hidden_layer_width, activation="relu"))
+            #model.add(Dense(layer_widths, activation="sigmoid"))
+
+        # model.add(Dense(3, activation="sigmoid"))
+        # model.add(Dense(3, activation="relu", kernel_constraint=maxnorm(3)))
+        # model.add(Dense(42, activation="relu"))
+
+        model.add(Dense(1, activation="sigmoid"))
+
+        #print("compile Model")
 
         model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=["accuracy"])
-        # self.model.compile(optimizer='adam', loss='mean_squared_error',metrics=["accuracy"])
-        # self.model.compile(optimizer="sgd", loss="categorical_crossentropy", metrics=["accuracy"])
+        return model
+
+
+
+
+    def compile_model(self,model ,optimizer):
+        model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=["accuracy"])
         return model
 
 
     def fit_model(self,data, model,epoch_batch_size):
         print("fit model")
-        predictors = data.drop(["target"],axis=1).values#.as_matrix()
+        predictors = data.drop(["target"],axis=1).to_numpy()#.as_matrix()
         #targets = to_categorical(data.target)
 
         predictor_scaler= StandardScaler().fit(predictors)
@@ -73,9 +105,9 @@ class NN_definer:
         print(data.target.values)
         print(predictors[1])
 
-        early_stopping_monitor= EarlyStopping(patience=140,monitor="val_accuracy")
+        early_stopping_monitor= EarlyStopping(patience=14,monitor="val_accuracy")
 
-        mt =model.fit(predictors,data.target.values, epochs=10000,batch_size=epoch_batch_size ,
+        mt =model.fit(predictors,data.target.to_numpy(), epochs=100,batch_size=epoch_batch_size ,
                       validation_split = 0.25,callbacks=[early_stopping_monitor])#
 
         mlist = [mt]
@@ -83,21 +115,6 @@ class NN_definer:
         #vs.accuracy_plot(self=vs, model_list=mlist)
         #self.save_model(model)
         return mt,model
-
-    def validate_model(self, data):
-        print("fit model")
-        predictors = data.drop(["target"], axis=1).to_numpy()  # .as_matrix()
-        # targets = to_categorical(data.target)
-
-        print(data.target.to_numpy())
-        print(predictors)
-
-        mt = self.model.fit(predictors, data.target.to_numpy(), epochs=500, validation_split=1)
-        mlist = [mt]
-        vs.validation_plot(self=vs, model_list=mlist)
-        vs.accuracy_plot(self=vs, model_list=mlist)
-        self.save_model()
-
 
 
     def save_model(self,model):

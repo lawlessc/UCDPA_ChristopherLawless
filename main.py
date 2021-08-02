@@ -6,6 +6,7 @@ import import_targets as tg
 #import kaggle_download as kg
 import exploratory_analysis as ex
 import HyperParameterOpto as tr
+import GridSearcher as gr
 
 # This is a sample Python script.
 
@@ -46,23 +47,25 @@ if __name__ == '__main__':
 #training
 
 #data = []
-data = samples.import_many_flat_samples_add_targets(0, 16)
+data = samples.import_many_flat_samples_add_targets(0, 20000)
 
-data.append(samples.import_many_flat_samples_add_targets(18, 1600))
-data.append(samples.import_many_flat_samples_add_targets(2000, 3000))
-data.append(samples.import_many_flat_samples_add_targets(5000, 6000))
-data.append(samples.import_many_flat_samples_add_targets(30000, 35000))
+#data.append(samples.import_many_flat_samples_add_targets(20000, 30000))
+#data.append(samples.import_many_flat_samples_add_targets(50000, 60000))
+
 #data.append(samples.import_many_flat_samples_add_targets(500000, 508000))
-#data.append(samples.import_many_flat_samples_add_targets(70000, 71000))
 
-#data.append(samples.import_many_flat_samples_add_targets(300000, 301000))
+
+#data =  data.append(samples.import_many_flat_samples_add_targets(300000, 301000))
 #data.append(samples.import_many_flat_samples_add_targets(200000, 210000))
 #data.append(samples.import_many_flat_samples_add_targets(100000, 200000))
 
 
-trainer = tr.hyper_paramenter_training()
+#trainer = tr.hyper_paramenter_training()
+#trainer.train_network(data)
 
-trainer.train_network(data)
+gs = gr.GridSearcher()
+
+gs.do_search(data)
 
 
 #Testing
