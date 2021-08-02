@@ -49,7 +49,8 @@ class GridSearcher:
 
 
         param_grid = {"epochs":[12],
-                      "hidden_layers": [2],
+                      "first_layer" :[100],
+                      "hidden_layers": [1],
                       "layer_widths": [12],
                        "optimizer": ["adam"],
                        "winit": ["normal"],

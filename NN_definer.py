@@ -53,14 +53,14 @@ class NN_definer:
 
         return model
 
-    def create_model(self, hidden_layers, layer_widths, optimizer, winit):
+    def create_model(self,first_layer, hidden_layers, layer_widths, optimizer, winit):
         model = Sequential()
 
         #print("Specify Model")
 
         # model.add(Dropout(0.03,  input_shape=(data.shape[1] - 1,))) #This might overkill considering the dataset is already full of noise
-
-        model.add(LeakyReLU(layer_widths,input_shape=(12288,)))
+        #model.add(Conv1D(1, 3, input_shape=(12288, 1)))
+        model.add(LeakyReLU(first_layer,input_shape=(12288,)))
         #model.add(Dense(layer_widths, activation="relu", input_shape=(12288,) ,kernel_initializer=winit))
         #model.add(Dense(layer_widths, activation="sigmoid",input_shape=(12288,) ,kernel_initializer=winit))
 
