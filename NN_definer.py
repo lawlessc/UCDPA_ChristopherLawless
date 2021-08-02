@@ -73,9 +73,9 @@ class NN_definer:
         print(data.target.values)
         print(predictors[1])
 
-        early_stopping_monitor= EarlyStopping(patience=14,monitor="val_accuracy")
+        early_stopping_monitor= EarlyStopping(patience=140,monitor="val_accuracy")
 
-        mt =model.fit(predictors,data.target.values, epochs=1000,batch_size=epoch_batch_size ,
+        mt =model.fit(predictors,data.target.values, epochs=10000,batch_size=epoch_batch_size ,
                       validation_split = 0.25,callbacks=[early_stopping_monitor])#
 
         mlist = [mt]
