@@ -8,6 +8,7 @@ from keras.optimizers import SGD ,Adam
 from keras.constraints import maxnorm
 from keras.callbacks import EarlyStopping
 from sklearn import preprocessing
+from sklearn.preprocessing import StandardScaler
 
 from keras.layers import Conv1D
 from keras.layers import Conv2D
@@ -20,34 +21,27 @@ import visualisers as vs
 
 class NN_definer:
 
-
-
-
-
     def load_model(self, model_name):
-        self.model = load_model(model_name)
+        return load_model(model_name)
 
-    def define_model(self, data):
+    def define_model(self, data, hidden_layers,hidden_layer_width):
         model = Sequential()
 
         print("Specify Model")
 
         #model.add(Dropout(0.03,  input_shape=(data.shape[1] - 1,)))
-        #model.add(Dense(3,activation="relu", input_shape=(data.shape[1] - 1,),kernel_constraint=maxnorm(3)))
-        #model.add(LeakyReLU(4096,input_shape=(data.shape[1] - 1,)))
-        model.add(Dense(4096, activation="sigmoid",input_shape=(data.shape[1] - 1,)))
+        #model.add(Dense(12289,activation="relu", input_shape=(data.shape[1] - 1,)))
+        model.add(LeakyReLU(hidden_layer_width,input_shape=(data.shape[1] - 1,)))
+        #model.add(Dense(hidden_layer_width, activation="relu",input_shape=(data.shape[1] - 1,)))
         #model.add(LeakyReLU(4))
         #model.add(LeakyReLU(60, input_shape=(data.shape[1] - 1,)))
         #model.add(Dropout(0.1))
        # model.add(Dense(2, activation="relu", kernel_constraint=maxnorm(3)))
-        model.add(LeakyReLU(30))
-      #  model.add(Dropout(0.1))
+        for x in range(hidden_layers):
+            model.add(LeakyReLU(hidden_layer_width))
+            #model.add(Dense(hidden_layer_width, activation="relu"))
 
-        #model.add(ELU(3,input_shape=(data.shape[1]-1,)))
-        #model.add(Dense(12289, activation="relu",input_shape=(data.shape[1]-1,)))
-        #model.add(LeakyReLU(4096))
-        model.add(LeakyReLU(30))
-        model.add(LeakyReLU(3))
+
         #model.add(Dense(3, activation="sigmoid"))
         #model.add(Dense(3, activation="relu", kernel_constraint=maxnorm(3)))
         #model.add(Dense(42, activation="relu"))
@@ -67,34 +61,38 @@ class NN_definer:
         return model
 
 
-    def fit_model(self,data, model):
+    def fit_model(self,data, model,epoch_batch_size):
         print("fit model")
         predictors = data.drop(["target"],axis=1).values#.as_matrix()
-        targets = to_categorical(data.target)
+        #targets = to_categorical(data.target)
 
+        predictor_scaler= StandardScaler().fit(predictors)
+
+        predictors= predictor_scaler.transform(predictors)
 
         print(data.target.values)
-        print(predictors)
+        print(predictors[1])
 
-        early_stopping_monitor= EarlyStopping(patience=4,monitor="val_accuracy")
+        early_stopping_monitor= EarlyStopping(patience=14,monitor="val_accuracy")
 
-        mt =model.fit(predictors,data.target.values, epochs=100 ,validation_split = 0.15,callbacks=[early_stopping_monitor])#, use_multiprocessing=True) This seems to be only for training large pools of models
+        mt =model.fit(predictors,data.target.values, epochs=1000,batch_size=epoch_batch_size ,
+                      validation_split = 0.25,callbacks=[early_stopping_monitor])#
 
         mlist = [mt]
-        vs.validation_plot(self=vs,model_list=mlist)
-        vs.accuracy_plot(self=vs, model_list=mlist)
-        self.save_model(model)
-        return model
+        #vs.validation_plot(self=vs,model_list=mlist)
+        #vs.accuracy_plot(self=vs, model_list=mlist)
+        #self.save_model(model)
+        return mt,model
 
     def validate_model(self, data):
         print("fit model")
-        predictors = data.drop(["target"], axis=1).values  # .as_matrix()
+        predictors = data.drop(["target"], axis=1).to_numpy()  # .as_matrix()
         # targets = to_categorical(data.target)
 
-        print(data.target.values)
+        print(data.target.to_numpy())
         print(predictors)
 
-        mt = self.model.fit(predictors, data.target.values, epochs=500, validation_split=1)
+        mt = self.model.fit(predictors, data.target.to_numpy(), epochs=500, validation_split=1)
         mlist = [mt]
         vs.validation_plot(self=vs, model_list=mlist)
         vs.accuracy_plot(self=vs, model_list=mlist)

@@ -1,5 +1,5 @@
 import pandas as pd
-import  numpy
+import numpy
 import import_ligo_samples
 import import_ligo_samples as samples
 import import_targets as tg
@@ -45,9 +45,10 @@ if __name__ == '__main__':
 
 #training
 
-data = []
+#data = []
+data = samples.import_many_flat_samples_add_targets(0, 16)
 
-data.append(samples.import_many_flat_samples_add_targets(0, 1600))
+data.append(samples.import_many_flat_samples_add_targets(18, 1600))
 data.append(samples.import_many_flat_samples_add_targets(2000, 3000))
 data.append(samples.import_many_flat_samples_add_targets(5000, 6000))
 data.append(samples.import_many_flat_samples_add_targets(30000, 35000))
@@ -56,8 +57,12 @@ data.append(samples.import_many_flat_samples_add_targets(70000, 71000))
 
 data.append(samples.import_many_flat_samples_add_targets(300000, 301000))
 data.append(samples.import_many_flat_samples_add_targets(200000, 210000))
+#data.append(samples.import_many_flat_samples_add_targets(100000, 200000))
 
-tr.train_network(data)
+
+trainer = tr.hyper_paramenter_training()
+
+trainer.train_network(data)
 
 
 #Testing

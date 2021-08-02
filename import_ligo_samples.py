@@ -78,6 +78,7 @@ def import_number_of_flat_testing_samples(starting_number, ending_number):
         sample_name_list.append(targets_df["id"].values[entry])
     #print(sample_name_list)
     return normalise_data( import_list_of_flat_testing_samples(sample_name_list) )
+    #return import_list_of_flat_testing_samples(sample_name_list)
 
 
 #by selecting a starting point and an end point the user can select a range of samples
@@ -90,6 +91,7 @@ def import_number_of_flat_training_samples(starting_number, ending_number):
         sample_name_list.append(targets_df["id"].values[entry])
     #print(sample_name_list)
     return normalise_data(import_list_of_flat_training_samples(sample_name_list))
+    #return import_list_of_flat_training_samples(sample_name_list)
 
 
 
@@ -128,9 +130,22 @@ def import_single_samples_of_number(number):
 
 def normalise_data(data):
     print("normalise data")
+    #df_copy = data.copy()
     #https://www.kaggle.com/parasjindal96/how-to-normalize-dataframe-pandas
-    #data_plus_10= data+10
+
     #dataf = ((data - data.min()) / (data.max() - data.min())) * 1
+
+
     return data
+
+
+def normalize_rows(data):
+    df_copy = data.copy()
+
+    for index,row in data.iterrows():
+        df_copy[row] = (data[row] - data[row].min()) / (data[row].max()-data[row].min())
+
+    return data
+
 
 
