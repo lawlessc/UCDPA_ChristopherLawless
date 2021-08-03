@@ -1,6 +1,6 @@
 import keras
 import pandas as pd
-from keras.layers import Dense, Dropout
+from keras.layers import Dense, Dropout,RNN, SimpleRNN,GRU,LSTM ,Reshape
 from keras.layers.advanced_activations import LeakyReLU ,PReLU,ELU
 from keras.utils.np_utils import to_categorical
 from keras.models import load_model ,Sequential
@@ -9,6 +9,7 @@ from keras.constraints import maxnorm
 from keras.callbacks import EarlyStopping
 from sklearn import preprocessing
 from sklearn.preprocessing import StandardScaler
+from keras import layers
 
 from keras.layers import Conv1D
 from keras.layers import Conv2D
@@ -32,7 +33,10 @@ class NN_definer:
         #model.add(Dropout(0.03,  input_shape=(data.shape[1] - 1,))) #This might overkill considering the dataset is already full of noise
 
         #model.add(LeakyReLU(hidden_layer_width,input_shape=(data.shape[1] - 1,)))
-        model.add(Dense(hidden_layer_width, activation="relu",input_shape=(data.shape[1] - 1,)))
+        #model.add(Dense(hidden_layer_width, activation="relu",input_shape=(data.shape[1] - 1,)))
+        model.add(SimpleRNN(units=32,input_shape=(4096,3) ,activation="relu"))
+        #model.add(LSTM(100))
+        #model.add(layers.MaxPooling1D((12288, 12288)))#lets just add a pooling layer and see what happens
         #model.add(LeakyReLU(4))
         #model.add(LeakyReLU(60, input_shape=(data.shape[1] - 1,)))
         #model.add(Dropout(0.1))
@@ -40,6 +44,7 @@ class NN_definer:
         for x in range(hidden_layers):
             print("layer added")
             model.add(LeakyReLU(hidden_layer_width))
+            #model.add(LSTM(hidden_layer_width))
             #model.add(Dense(hidden_layer_width, activation="relu"))
 
 
@@ -59,8 +64,11 @@ class NN_definer:
         #print("Specify Model")
 
         # model.add(Dropout(0.03,  input_shape=(data.shape[1] - 1,))) #This might overkill considering the dataset is already full of noise
-        #model.add(Conv1D(1, 3, input_shape=(12288, 1)))
-        model.add(LeakyReLU(first_layer,input_shape=(12288,)))
+        #model.add(Conv1D(first_layer, 3, input_shape=(12288, 1)))
+        #model.add(LeakyReLU(first_layer,input_shape=(12288,)))
+        model.add(Reshape((3,4096), input_shape=(12288,)))
+        model.add(SimpleRNN(units=first_layer, input_shape=(3, 4096), activation="relu"))
+        #model.add(layers.MaxPooling2D((2, 2)))
         #model.add(Dense(layer_widths, activation="relu", input_shape=(12288,) ,kernel_initializer=winit))
         #model.add(Dense(layer_widths, activation="sigmoid",input_shape=(12288,) ,kernel_initializer=winit))
 
@@ -69,8 +77,9 @@ class NN_definer:
         # model.add(Dropout(0.1))
         # model.add(Dense(2, activation="relu", kernel_constraint=maxnorm(3)))
         for x in range(hidden_layers):
-            print("layer added")
+            ##print("layer added")
             model.add(LeakyReLU(layer_widths))
+            #model.add(LSTM(layer_widths))
             # model.add(Dense(hidden_layer_width, activation="relu"))
             #model.add(Dense(layer_widths, activation="sigmoid"))
 
@@ -79,10 +88,12 @@ class NN_definer:
         # model.add(Dense(42, activation="relu"))
 
         model.add(Dense(1, activation="sigmoid"))
+        #model.add(Dense(2, activation="softmax"))
 
         #print("compile Model")
 
         model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=["accuracy"])
+        #model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=["accuracy"])
         return model
 
 

@@ -1,4 +1,4 @@
-from keras.optimizers import SGD ,Adam
+from keras.optimizers import SGD ,Adam, RMSprop
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
@@ -7,7 +7,7 @@ from keras.layers import Dense
 from keras.wrappers.scikit_learn import KerasClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import StandardScaler
-
+from keras.utils.np_utils import to_categorical
 
 import NN_definer as nnd
 
@@ -19,12 +19,16 @@ class GridSearcher:
 
     def do_search(self,data):
 
-        predictors = data.drop(["target"], axis=1).to_numpy()  # .as_matrix()
+
+        predictors = data.drop(["target"], axis=1).to_numpy()  # .as_matrix() used in datacamp but is deprecated
         predictor_scaler = StandardScaler().fit(predictors)
         predictors = predictor_scaler.transform(predictors)
 
+        #predictors.reshape(2,3,2)
+
+        #print(predictors.shape())
         #print(data.target.values)
-        #print(predictors[1])
+        print(predictors[1])
 
         my_optimizer = SGD(learning_rate=0.000001, momentum=0.99, nesterov=False)
        # my_optimizer2 = SGD(learning_rate=0.000001, momentum=0.33, nesterov=True)
@@ -40,6 +44,8 @@ class GridSearcher:
         adam2 = Adam(learning_rate=0.0333)
         adam3 = Adam(learning_rate=0.00000333)
 
+        rms1 = RMSprop(learning_rate=0.1)
+
 
 
         model = KerasClassifier(build_fn=self.neuralnet_d.create_model)
@@ -49,16 +55,18 @@ class GridSearcher:
 
 
         param_grid = {"epochs":[12],
-                      "first_layer" :[100],
-                      "hidden_layers": [1],
-                      "layer_widths": [12],
-                       "optimizer": ["adam"],
+                      "first_layer" :[10,100,4096],
+                      "hidden_layers": [0,1,3],
+                      "layer_widths": [12,13,14],
+                       "optimizer": ["RMSprop"],
                        "winit": ["normal"],
-                      "batch_size":[20]
+                      "batch_size":[10,20,30]
                       }
 
 
         grid = GridSearchCV(estimator=model,param_grid= param_grid, n_jobs= 1, cv=3)
+
+        #targets = to_categorical(data.target.values)
 
         results = grid.fit(predictors,data.target.values)
 
