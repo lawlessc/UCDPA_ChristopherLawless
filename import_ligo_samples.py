@@ -79,11 +79,18 @@ def import_flat_training_sample(sample_name):
     #
     testnpy[2, :] = np.negative(testnpy[2, :])#maybe the location of the virgo array means flipping this will help
 
+
     greatest_common = []
+    average_array = []
+
+    for i in range(0, 4096):
+        x = (testnpy[0, i] + testnpy[1, i]) / 2
+        average_array.append(x)
 
     for i in range(0,4096):
-        x =   math.gcd(int(testnpy[0,i]),int(testnpy[1,i]))
+        x =   math.gcd(int(testnpy[0,i]),int(average_array[i]))
         greatest_common.append(x)
+
 
    # testnpy = np.append(testnpy,average_array,axis=1)
 
@@ -91,7 +98,7 @@ def import_flat_training_sample(sample_name):
     # scaler.fit(testnpy)
     # testnpy= scaler.transform(testnpy)
 
-    diff1= np.subtract(testnpy[0,i],greatest_common)
+    diff1= np.subtract(testnpy[1,i],greatest_common)
     #diff1=
 
    # difference =  np.subtract(np.array(testnpy[0,:]),testnpy[1,:])
@@ -260,23 +267,29 @@ def import_single_samples_of_number(number):
 
 
 
-def peak_counter(an_array):
+def peak_counter_evolope(an_array):
     count =0
+    envelope_points = []
 
     for i in range(1 ,len(an_array)-1):
         if an_array[i] > an_array[i-1]:
             if an_array[i] > an_array[i+1]:
+                for x range
+
+
                 count+=1
-    return count
+    return count, envelope_points
 
 def trough_counter(an_array):
     count =0
+    envelope_points =[]
 
     for i in range(1 ,len(an_array)-1):
         if an_array[i] < an_array[i-1]:
             if an_array[i] < an_array[i+1]:
                 count+=1
-    return count
+
+    return count, envelope_points
 
 
 
