@@ -3,6 +3,9 @@ import numpy as np
 import get_ligo_path as gp
 import import_targets as tg
 from sklearn import preprocessing
+from sklearn.preprocessing import StandardScaler, MaxAbsScaler,MinMaxScaler,Normalizer
+
+
 
 #just a test on a single file, shows 3 rows, 4096 columns
 #These rows correspond to the 3 detectors.
@@ -11,14 +14,6 @@ def import_test():
     print(type(testnpy))
     print(testnpy.shape)
     return testnpy
-
-
-def import_to_dataframe_test():
-    testnpy = np.load("00000e74ad")
-    #df = pd.DataFrame(testnpy,columns =["detector_1","detector_2","detector_3"])
-    df = pd.DataFrame(testnpy).T #Transposed to avoid awefulness.
-    return  df
-
 
 def import_single_sample(sample_name):
     #samples names are hex numbers in the targets file
@@ -34,8 +29,16 @@ def import_flat_training_sample(sample_name):
     #The first 3 also represent the path characters represent
     testnpy = np.load(gp.get_path_training(sample_name))
              #This flattens a sample numpy from 3 rows to one row
-    flat = testnpy.flatten()
-    return flat
+   # flat = testnpy.flatten()
+
+    #predictor_scaler = StandardScaler().fit(testnpy)
+    #predictors = predictor_scaler.transform(testnpy)
+
+    scaler = MinMaxScaler()
+    scaler.fit(testnpy)
+    predictors = scaler.transform(testnpy)
+
+    return predictors.flatten()
 
 def import_flat_testing_sample(sample_name):
 
