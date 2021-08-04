@@ -26,16 +26,36 @@ class NN_definer:
     def load_model(self, model_name):
         return load_model(model_name)
 
-    def define_model(self, data, hidden_layers, hidden_layer_width):
+    def create_model(self, first_layer, dropout, decay, hidden_layers, layer_widths, optimizer, winit):
         model = Sequential()
 
-        print("Specify Model")
+        #model.add(Reshape((4096, 3), input_shape=(12288,)))
+        if dropout > 0:
+           model.add(Dropout(dropout,  input_shape=(12288,))) #This might overkill considering the dataset is already full of noise
+        # model.add(LeakyReLU(first_layer,input_shape=(12288,)))
+        model.add(LeakyReLU(first_layer, input_shape=(12288,)))
+        # model.add(Dropout(dropout))
+        #model.add(SimpleRNN(units=first_layer, input_shape=(4096, 3), activation="relu", return_sequences=True,
+        #                    kernel_regularizer=l2(decay), recurrent_regularizer=l2(decay), bias_regularizer=l2(decay)))
+        # model.add(Dense(layer_widths, activation="relu", input_shape=(12288,) ,kernel_initializer=winit))
+        # model.add(Dense(layer_widths, activation="sigmoid",input_shape=(12288,) ,kernel_initializer=winit))
+        for x in range(hidden_layers):
+            model.add(LeakyReLU(layer_widths))
+            # model.add(LSTM(layer_widths))
+            # model.add(Dense(hidden_layer_width, activation="relu"))
+            # model.add(Dense(layer_widths, activation="sigmoid"))
+        model.add(Dense(2, activation="softmax"))
+        # model.add(Dense(1, activation="sigmoid"))
+        # model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=["accuracy"])
+        model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=["accuracy"])
+        return model
 
+    def define_model(self, data, hidden_layers, hidden_layer_width):
+        model = Sequential()
         #model.add(Dropout(0.03,  input_shape=(data.shape[1] - 1,))) #This might overkill considering the dataset is already full of noise
-
-        #model.add(LeakyReLU(hidden_layer_width,input_shape=(data.shape[1] - 1,)))
+        model.add(LeakyReLU(hidden_layer_width,input_shape=(data.shape[1] - 1,)))
         #model.add(Dense(hidden_layer_width, activation="relu",input_shape=(data.shape[1] - 1,)))
-        model.add(SimpleRNN(units=32,input_shape=(4096,3) ,activation="relu"))
+        #model.add(SimpleRNN(units=32,input_shape=(4096,3) ,activation="relu"))
         #model.add(LSTM(100))
         #model.add(layers.MaxPooling1D((12288, 12288)))#lets just add a pooling layer and see what happens
         #model.add(LeakyReLU(4))
@@ -47,48 +67,13 @@ class NN_definer:
             model.add(LeakyReLU(hidden_layer_width))
             #model.add(LSTM(hidden_layer_width))
             #model.add(Dense(hidden_layer_width, activation="relu"))
-
-
         #model.add(Dense(3, activation="sigmoid"))
         #model.add(Dense(3, activation="relu", kernel_constraint=maxnorm(3)))
         #model.add(Dense(42, activation="relu"))
-
         model.add(Dense(1, activation="sigmoid"))
-
         print("compile Model")
-
         return model
 
-    def create_model(self,first_layer,dropout, decay,hidden_layers, layer_widths, optimizer, winit):
-        model = Sequential()
-
-        #model.add(Dropout(0.03,  input_shape=(data.shape[1] - 1,))) #This might overkill considering the dataset is already full of noise
-        #model.add(LeakyReLU(first_layer,input_shape=(12288,)))
-        model.add(LeakyReLU(first_layer, input_shape=(4096,)))
-        #model.add(Reshape((3,4096), input_shape=(12288,)))
-        #model.add(Dropout(dropout))
-        #model.add(SimpleRNN(units=first_layer, input_shape=(4096,3), activation="sigmoid", return_sequences=True,
-        #                   kernel_regularizer=l2(decay), recurrent_regularizer=l2(decay), bias_regularizer=l2(decay)))
-        #model.add(Dense(layer_widths, activation="relu", input_shape=(12288,) ,kernel_initializer=winit))
-        #model.add(Dense(layer_widths, activation="sigmoid",input_shape=(12288,) ,kernel_initializer=winit))
-        # model.add(LeakyReLU(4))
-        # model.add(Dropout(0.1))
-        # model.add(Dense(2, activation="relu", kernel_constraint=maxnorm(3)))
-        for x in range(hidden_layers):
-            model.add(LeakyReLU(layer_widths))
-             #model.add(LSTM(layer_widths))
-             # model.add(Dense(hidden_layer_width, activation="relu"))
-             #model.add(Dense(layer_widths, activation="sigmoid"))
-
-        # model.add(Dense(3, activation="sigmoid"))
-        # model.add(Dense(3, activation="relu", kernel_constraint=maxnorm(3)))
-        # model.add(Dense(42, activation="relu"))
-
-        model.add(Dense(1, activation="sigmoid"))
-
-        model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=["accuracy"])
-        #model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=["accuracy"])
-        return model
 
 
 

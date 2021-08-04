@@ -27,3 +27,16 @@ def accuracy_plot(self ,model_list):
     plt.ylabel('Accuracy score')
     plt.legend()
     plt.show()
+
+
+def signal_plotter(self, signals_list):
+
+    for signals in signals_list:
+        plt.plot(signals, label="signal")
+
+    plt.xlabel('Time')
+    plt.ylabel('Signal')
+    plt.legend()
+    plt.show()
+
+

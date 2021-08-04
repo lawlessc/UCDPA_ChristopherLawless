@@ -47,7 +47,7 @@ if __name__ == '__main__':
 #training
 
 #data = []
-data = samples.import_many_flat_samples_add_targets(0,3000)
+data = samples.import_many_flat_samples_add_targets(0,6000)
 
 #data.append(samples.import_many_flat_samples_add_targets(20000, 30000))
 #data.append(samples.import_many_flat_samples_add_targets(50000, 60000))

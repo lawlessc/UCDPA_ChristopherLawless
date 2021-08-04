@@ -1,10 +1,13 @@
+import math
+
 import pandas as pd
 import numpy as np
 import get_ligo_path as gp
 import import_targets as tg
 from sklearn import preprocessing
 from sklearn.preprocessing import StandardScaler, MaxAbsScaler,MinMaxScaler,Normalizer, normalize
-
+import visualisers as vs
+from fractions import gcd
 
 
 #just a test on a single file, shows 3 rows, 4096 columns
@@ -54,15 +57,98 @@ def import_flat_training_sample(sample_name):
     #predictors = normalize(testnpy,axis=0)
     #print("test1" +str(predictors) )
     #predictors = normalize(testnpy, axis=1)
-   # print("test2" + str(predictors))
+    # print("test2" + str(testnpy))
 
-    predictors = np.add(np.array(testnpy[0,:]),np.array(testnpy[1,:]))
-    predictors = np.subtract(predictors, np.array(testnpy[2, :]))
+    # predictors = np.multiply(np.array(testnpy[0,:]),np.array(testnpy[1,:]))
+    # predictors = np.multiply(predictors, np.array(testnpy[2, :]))
+
+    # print("predictors: " +str(predictors))
+    #
+    # print("Peaks1: %i troughs: %i" , str(peak_counter(testnpy[0,:])), str(trough_counter(testnpy[0,:])))
+    # print("Peaks2: %i  troughs: %i" , str(peak_counter(testnpy[1, :])), str(trough_counter(testnpy[1,:])))
+    # print("Peaks3: %i  troughs: %i", str(peak_counter(testnpy[2, :])), str(trough_counter(testnpy[2,:])))
+
+
+    #doing this beacause i think scientifica notation was messing with everything.
+    bignum  = 1000000000000000000000
+    bignum2 = 10000000000000000000000*0.3
+
+    testnpy[0,:] =   np.multiply(bignum, testnpy[0,:])
+    testnpy[1, :] =  np.multiply(bignum, testnpy[1, :])
+    testnpy[2, :] =  np.multiply(bignum2, testnpy[2, :])
+    #
+    testnpy[2, :] = np.negative(testnpy[2, :])#maybe the location of the virgo array means flipping this will help
+
+    greatest_common = []
+
+    for i in range(0,4096):
+        x =   math.gcd(int(testnpy[0,i]),int(testnpy[1,i]))
+        greatest_common.append(x)
+
+   # testnpy = np.append(testnpy,average_array,axis=1)
+
+    # scaler = MinMaxScaler()
+    # scaler.fit(testnpy)
+    # testnpy= scaler.transform(testnpy)
+
+    diff1= np.subtract(testnpy[0,i],greatest_common)
+    #diff1=
+
+   # difference =  np.subtract(np.array(testnpy[0,:]),testnpy[1,:])
+
+   # added = np.add(np.array(testnpy[0,:]),testnpy[1,:])
+
+   # diff1 = np.subtract(difference,added)
+    #diff1 = np.subtract(diff1,np.array(testnpy[0, :]))
+
+
+
+   # diff1 = np.subtract(difference,np.array(testnpy[0,:]))
+    #diff1 = np.subtract(diff1, np.array(testnpy[1, :]))
+    #diff2 = np.subtract(diff2, np.array(testnpy[1, :]))
+
+   # testnpy[0, :] = np.subtract(testnpy[0, :], diff1)
+ #   testnpy[1, :] = np.subtract(testnpy[1, :], diff2)
+
+
+
+
+
+    #testnpy[0, :] = np.subtract(testnpy[0, :], diff1)
+    #testnpy[1, :] = np.subtract(testnpy[1, :], diff2)
+    #testnpy[2, :] = np.subtract(testnpy[2, :], diff3)
+
+     #testnpy[0, :] = np.array(diff1)
+    # testnpy[1, :] = np.array(diff2)
+    # testnpy[2, :] = np.array(average_array)
+
+
+    predictor_scaler = Normalizer().fit(testnpy)
+    testnpy = predictor_scaler.transform(testnpy)
+
+
+
+
+    # print("test3" + str(testnpy))
+    #
+    signal_list = [diff1]
+    vs.signal_plotter(self=vs ,signals_list=  signal_list)
+
+
+    #new idea, get differences between all three and sum the differences
+    # diff1 = np.subtract(np.array(testnpy[0,:]),np.array(testnpy[1,:]))
+    # diff2 = np.subtract(np.array(testnpy[0, :]), np.array(testnpy[2, :]))
+    # diff3 = np.subtract(np.array(testnpy[2, :]), np.array(testnpy[1, :]))
+    #
+    # predictors = np.add(diff1, diff2)
+    # predictors = np.add(predictors, diff3)
 
    #np.d
 
-    predictors = predictors - np.mean(predictors)
-    predictors = predictors / np.max(predictors)
+    # predictors = predictors - np.mean(predictors)
+    # predictors = predictors / np.max(predictors)
+    # #
+    # print("normalized" + str(predictors))
 
     #predictors = normalize(predictors, axis=1)
     #predictors = normalize(predictors, axis=1)
@@ -77,7 +163,7 @@ def import_flat_training_sample(sample_name):
     #print("log test:"+str(predictors)) #This just breaks the data by outputing NANs for negatives
 
     #return predictors.flatten()
-    return predictors
+    return testnpy.flatten()
 
 def import_flat_testing_sample(sample_name):
 
@@ -162,7 +248,7 @@ def import_many_flat_samples_add_targets(starting_number, ending_number):
     print("import_list_of_flat_samples")
     samples_df = import_list_of_flat_training_samples(sample_name_list)
     samples_df["target"] = target_list
-    #print(samples_df)
+    print(samples_df)
     return samples_df
 
 
@@ -172,6 +258,25 @@ def import_single_samples_of_number(number):
     return targets_df["id"].values[number]
 
 
+
+
+def peak_counter(an_array):
+    count =0
+
+    for i in range(1 ,len(an_array)-1):
+        if an_array[i] > an_array[i-1]:
+            if an_array[i] > an_array[i+1]:
+                count+=1
+    return count
+
+def trough_counter(an_array):
+    count =0
+
+    for i in range(1 ,len(an_array)-1):
+        if an_array[i] < an_array[i-1]:
+            if an_array[i] < an_array[i+1]:
+                count+=1
+    return count
 
 
 
