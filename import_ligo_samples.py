@@ -3,7 +3,7 @@ import numpy as np
 import get_ligo_path as gp
 import import_targets as tg
 from sklearn import preprocessing
-from sklearn.preprocessing import StandardScaler, MaxAbsScaler,MinMaxScaler,Normalizer
+from sklearn.preprocessing import StandardScaler, MaxAbsScaler,MinMaxScaler,Normalizer, normalize
 
 
 
@@ -34,11 +34,50 @@ def import_flat_training_sample(sample_name):
     #predictor_scaler = StandardScaler().fit(testnpy)
     #predictors = predictor_scaler.transform(testnpy)
 
-    scaler = MinMaxScaler()
-    scaler.fit(testnpy)
-    predictors = scaler.transform(testnpy)
+    #print("shape:"+str(testnpy.shape))
 
-    return predictors.flatten()
+    scaler = MinMaxScaler()
+    # scaler.fit(testnpy)
+
+    # predictors = [] #this is just so i don't have an empty array
+    # scaler.fit(testnpy[0,:])
+    # predictors[0] = scaler.transform(testnpy[0])
+    #
+    # scaler.fit(testnpy[1])
+    # predictors[1] = scaler.transform(testnpy[1])
+    #
+    # scaler.fit(testnpy[2])
+    # predictors[2] = scaler.transform(testnpy[2])
+
+    #testnpy[0,:]  = normalize(testnpy[0,:])
+
+    #predictors = normalize(testnpy,axis=0)
+    #print("test1" +str(predictors) )
+    #predictors = normalize(testnpy, axis=1)
+   # print("test2" + str(predictors))
+
+    predictors = np.add(np.array(testnpy[0,:]),np.array(testnpy[1,:]))
+    predictors = np.subtract(predictors, np.array(testnpy[2, :]))
+
+   #np.d
+
+    predictors = predictors - np.mean(predictors)
+    predictors = predictors / np.max(predictors)
+
+    #predictors = normalize(predictors, axis=1)
+    #predictors = normalize(predictors, axis=1)
+
+    #print("first"+str(testnpy[0,1]))
+
+    #scaler = MaxAbsScaler()
+    #scaler.fit(testnpy)
+    #predictors = scaler.transform(testnpy)
+
+    #predictors = np.log(testnpy)
+    #print("log test:"+str(predictors)) #This just breaks the data by outputing NANs for negatives
+
+    #return predictors.flatten()
+    return predictors
 
 def import_flat_testing_sample(sample_name):
 

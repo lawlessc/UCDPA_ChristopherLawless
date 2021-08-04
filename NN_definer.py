@@ -63,9 +63,10 @@ class NN_definer:
         model = Sequential()
 
         #model.add(Dropout(0.03,  input_shape=(data.shape[1] - 1,))) #This might overkill considering the dataset is already full of noise
-        model.add(LeakyReLU(first_layer,input_shape=(12288,)))
+        #model.add(LeakyReLU(first_layer,input_shape=(12288,)))
+        model.add(LeakyReLU(first_layer, input_shape=(4096,)))
         #model.add(Reshape((3,4096), input_shape=(12288,)))
-        model.add(Dropout(dropout))
+        #model.add(Dropout(dropout))
         #model.add(SimpleRNN(units=first_layer, input_shape=(4096,3), activation="sigmoid", return_sequences=True,
         #                   kernel_regularizer=l2(decay), recurrent_regularizer=l2(decay), bias_regularizer=l2(decay)))
         #model.add(Dense(layer_widths, activation="relu", input_shape=(12288,) ,kernel_initializer=winit))

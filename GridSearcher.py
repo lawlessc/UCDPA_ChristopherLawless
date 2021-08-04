@@ -58,12 +58,12 @@ class GridSearcher:
 
 
         param_grid = {"epochs":[10,25],
-                      "first_layer" :[10,100,500,4096],
-                      "hidden_layers": [0,1,2,3],
-                      "layer_widths": [2,3,4,5],
+                      "first_layer" :[3,10,100,500,4096],
+                      "hidden_layers": [1,2,3],
+                      "layer_widths": [3,4,5,25],
                        "optimizer": ["adam"],
                        "winit": ["normal"],
-                      "batch_size":[10],
+                      "batch_size":[10,20],
                       "dropout":[0.3],
                       "decay":[0.01]
                       }
