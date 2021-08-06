@@ -1,5 +1,8 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
+from scipy import signal
+from scipy.fft import fftshift
 
 def validation_plot(self ,model_list):
 
@@ -38,5 +41,28 @@ def signal_plotter(self, signals_list):
     plt.ylabel('Signal')
     plt.legend()
     plt.show()
+
+     #The blackhole colission should be represented by a high rising frequency so maybe FFT can remove it.
+def fftPlot(self, xf,yf):
+
+
+    plt.plot(xf, np.abs(yf))
+
+    plt.xlabel('Frequency')
+    #plt.ylabel('Frequency')
+    #plt.legend()
+    plt.show()
+
+#https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.spectrogram.html
+def spectralplot(self,data):
+
+
+    f, t, Sxx = signal.spectrogram(data,4096)
+    plt.pcolormesh(t, f, Sxx, shading='gouraud')
+    plt.ylabel('Frequency [Hz]')
+    plt.xlabel('Time [sec]')
+
+    plt.show()
+
 
 

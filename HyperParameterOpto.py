@@ -18,10 +18,6 @@ class hyper_paramenter_training:
     neuralnet_d = nnd.NN_definer()
 
     def train_network(self,data):
-
-
-
-
         my_optimizer =  SGD(learning_rate=0.0001,momentum=0.99, nesterov=True)
         my_optimizer2 = SGD(learning_rate=0.0000001,momentum=0.99, nesterov=True)
         my_optimizer3 = SGD(learning_rate=0.000001, momentum=0.30, nesterov=False)
@@ -55,10 +51,6 @@ class hyper_paramenter_training:
 
                         self.set_best_model(history,model)
 
-
-
-
-
     def set_best_model(self,history,model):
         print(history.history.keys())
         #print("test"+str(history.history["val_accuracy"]))
@@ -75,5 +67,3 @@ class hyper_paramenter_training:
             self.best_accuracy = history.history["val_accuracy"]
             print("New Best accuracy"+str(history.history["val_accuracy"]))
             self.neuralnet_d.save_model(model)
-
-

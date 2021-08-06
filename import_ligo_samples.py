@@ -5,172 +5,121 @@ import numpy as np
 import get_ligo_path as gp
 import import_targets as tg
 from sklearn import preprocessing
-from sklearn.preprocessing import StandardScaler, MaxAbsScaler,MinMaxScaler,Normalizer, normalize
+from sklearn.preprocessing import StandardScaler, MaxAbsScaler,MinMaxScaler,Normalizer, normalize, RobustScaler
 import visualisers as vs
 from fractions import gcd
+from scipy.fft import fft ,fftfreq , ifft , rfft, rfftfreq
+from scipy.fft import irfft
+#import scipy.stats.signaltonoise as sn
+from sklearn.decomposition import PCA
+
 
 
 #just a test on a single file, shows 3 rows, 4096 columns
 #These rows correspond to the 3 detectors.
 def import_test():
-    testnpy = np.load("data/00000e74ad.npy")
-    print(type(testnpy))
-    print(testnpy.shape)
+    testnpy = np.load("data/train/0/0/0/00000e74ad.npy")
+    #print("import_test():")
+
+    #print(testnpy[0,0])
+    #print(type(testnpy))
+
+    #print(testnpy.shape)
     return testnpy
 
 def import_single_sample(sample_name):
-    #samples names are hex numbers in the targets file
-    #The first 3 characters represent
-    #print(gp.get_path(sample_name))
-    #print(gp.get_path_training(sample_name))
-
     testnpy = np.load(gp.get_path_training(sample_name))
     df = pd.DataFrame(testnpy)
 
 def import_flat_training_sample(sample_name):
+    #print("import_flat_training_sample")
     #samples names are hex numbers in the targets file
     #The first 3 also represent the path characters represent
-    testnpy = np.load(gp.get_path_training(sample_name))
-             #This flattens a sample numpy from 3 rows to one row
-   # flat = testnpy.flatten()
+    detector_readings = np.load(gp.get_path_training(sample_name))
+
+
+
+    #doing this beacause i think scientific notation was messing with everything.
+    #Manual scaling
+    bignum  = 100000000000000000000
+    bignum2 = 1000000000000000000000*0.4
+
+    detector_readings[0,:] =   np.multiply(bignum, detector_readings[0,:])
+    detector_readings[1, :] =  np.multiply(bignum, detector_readings[1, :])
+    detector_readings[2, :] =  np.multiply(bignum2, detector_readings[2, :])
+
+    #testnpy[2, :] = np.negative(testnpy[2, :])#maybe the location of the virgo array means flipping this will help
+    detector_readings[2, :] = np.negative(detector_readings[2, :])
+    #testnpy[1, :] = np.negative(testnpy[1, :])
+
+    #predictor_scaler = StandardScaler().fit(detector_readings)
+    #detector_readings = predictor_scaler.transform(detector_readings)
+
+    vs.spectralplot(self=vs,data=detector_readings[1,:])
+
+
+
+
+    #I learnt to use this here https://realpython.com/python-scipy-fft/
+    # yf1=  rfft(detector_readings[0, :])
+    # xf1 =rfftfreq(4096, 1 / 2048)
+    # points_per_freq = len(xf1) / (2048 / 2)
+    # for frequency in range(0,30):
+    #     target_idx = int(points_per_freq * frequency)
+    #     yf1[target_idx - 1: target_idx + 2] = 0
+    # detector_readings[0, :]= irfft(yf1)
+    #
+    # for frequency in range(120,1100):
+    #     target_idx = int(points_per_freq * frequency)
+    #     yf1[target_idx - 1: target_idx + 2] = 0
+    # detector_readings[0, :] = irfft(yf1)
+    #
+    # yf2=  rfft(detector_readings[1, :])
+    # xf2 =rfftfreq(4096, 1 / 2048)
+    # points_per_freq = len(xf2) / (2048 / 2)
+    # for frequency in range(0,30):
+    #     target_idx = int(points_per_freq * frequency)
+    #     yf2[target_idx - 1: target_idx + 2] = 0
+    # detector_readings[1, :]= irfft(yf2)
+    #
+    # for frequency in range(120,1100):
+    #     target_idx = int(points_per_freq * frequency)
+    #     yf2[target_idx - 1: target_idx + 2] = 0
+    # detector_readings[1, :]= irfft(yf2)
+    #
+    # yf3=  rfft(detector_readings[2, :])
+    # xf3 =rfftfreq(4096, 1 / 2048)
+    # points_per_freq = len(xf3) / (2048 / 2)
+    # for frequency in range(0,30):
+    #     target_idx = int(points_per_freq * frequency)
+    #     yf3[target_idx - 1: target_idx + 2] = 0
+    # detector_readings[2, :] = irfft(yf3)
+    #
+    # for frequency in range(120,1100):
+    #     target_idx = int(points_per_freq * frequency)
+    #     yf3[target_idx - 1: target_idx + 2] = 0
+    # detector_readings[2, :] = irfft(yf3)
 
     #predictor_scaler = StandardScaler().fit(testnpy)
-    #predictors = predictor_scaler.transform(testnpy)
+    #testnpy = predictor_scaler.transform(testnpy)
 
-    #print("shape:"+str(testnpy.shape))
-
-    scaler = MinMaxScaler()
-    # scaler.fit(testnpy)
-
-    # predictors = [] #this is just so i don't have an empty array
-    # scaler.fit(testnpy[0,:])
-    # predictors[0] = scaler.transform(testnpy[0])
-    #
-    # scaler.fit(testnpy[1])
-    # predictors[1] = scaler.transform(testnpy[1])
-    #
-    # scaler.fit(testnpy[2])
-    # predictors[2] = scaler.transform(testnpy[2])
-
-    #testnpy[0,:]  = normalize(testnpy[0,:])
-
-    #predictors = normalize(testnpy,axis=0)
-    #print("test1" +str(predictors) )
-    #predictors = normalize(testnpy, axis=1)
-    # print("test2" + str(testnpy))
-
-    # predictors = np.multiply(np.array(testnpy[0,:]),np.array(testnpy[1,:]))
-    # predictors = np.multiply(predictors, np.array(testnpy[2, :]))
-
-    # print("predictors: " +str(predictors))
-    #
-    # print("Peaks1: %i troughs: %i" , str(peak_counter(testnpy[0,:])), str(trough_counter(testnpy[0,:])))
-    # print("Peaks2: %i  troughs: %i" , str(peak_counter(testnpy[1, :])), str(trough_counter(testnpy[1,:])))
-    # print("Peaks3: %i  troughs: %i", str(peak_counter(testnpy[2, :])), str(trough_counter(testnpy[2,:])))
+   # robusts = RobustScaler()
+   # testnpy = robusts.fit_transform(testnpy)
 
 
-    #doing this beacause i think scientifica notation was messing with everything.
-    bignum  = 1000000000000000000000
-    bignum2 = 10000000000000000000000*0.3
+    #vs.fftPlot(self=vs,xf=xf1,yf=yf1)
 
-    testnpy[0,:] =   np.multiply(bignum, testnpy[0,:])
-    testnpy[1, :] =  np.multiply(bignum, testnpy[1, :])
-    testnpy[2, :] =  np.multiply(bignum2, testnpy[2, :])
-    #
-    testnpy[2, :] = np.negative(testnpy[2, :])#maybe the location of the virgo array means flipping this will help
-
-
-    greatest_common = []
-    average_array = []
-
-    for i in range(0, 4096):
-        x = (testnpy[0, i] + testnpy[1, i]) / 2
-        average_array.append(x)
-
-    for i in range(0,4096):
-        x =   math.gcd(int(testnpy[0,i]),int(average_array[i]))
-        greatest_common.append(x)
-
-
-   # testnpy = np.append(testnpy,average_array,axis=1)
-
-    # scaler = MinMaxScaler()
-    # scaler.fit(testnpy)
-    # testnpy= scaler.transform(testnpy)
-
-    diff1= np.subtract(testnpy[1,i],greatest_common)
-    #diff1=
-
-   # difference =  np.subtract(np.array(testnpy[0,:]),testnpy[1,:])
-
-   # added = np.add(np.array(testnpy[0,:]),testnpy[1,:])
-
-   # diff1 = np.subtract(difference,added)
-    #diff1 = np.subtract(diff1,np.array(testnpy[0, :]))
+    #signal_list = [detector_readings[0,:],detector_readings[1,:],detector_readings[2,:]]#,testnpy[1,:],testnpy[2,:]]
+    #vs.signal_plotter(self=vs ,signals_list=  signal_list)
 
 
 
-   # diff1 = np.subtract(difference,np.array(testnpy[0,:]))
-    #diff1 = np.subtract(diff1, np.array(testnpy[1, :]))
-    #diff2 = np.subtract(diff2, np.array(testnpy[1, :]))
-
-   # testnpy[0, :] = np.subtract(testnpy[0, :], diff1)
- #   testnpy[1, :] = np.subtract(testnpy[1, :], diff2)
+    #signal_list = [testnpy[0,:]]
+    #vs.signal_plotter(self=vs ,signals_list=  signal_list)
 
 
-
-
-
-    #testnpy[0, :] = np.subtract(testnpy[0, :], diff1)
-    #testnpy[1, :] = np.subtract(testnpy[1, :], diff2)
-    #testnpy[2, :] = np.subtract(testnpy[2, :], diff3)
-
-     #testnpy[0, :] = np.array(diff1)
-    # testnpy[1, :] = np.array(diff2)
-    # testnpy[2, :] = np.array(average_array)
-
-
-    predictor_scaler = Normalizer().fit(testnpy)
-    testnpy = predictor_scaler.transform(testnpy)
-
-
-
-
-    # print("test3" + str(testnpy))
-    #
-    signal_list = [diff1]
-    vs.signal_plotter(self=vs ,signals_list=  signal_list)
-
-
-    #new idea, get differences between all three and sum the differences
-    # diff1 = np.subtract(np.array(testnpy[0,:]),np.array(testnpy[1,:]))
-    # diff2 = np.subtract(np.array(testnpy[0, :]), np.array(testnpy[2, :]))
-    # diff3 = np.subtract(np.array(testnpy[2, :]), np.array(testnpy[1, :]))
-    #
-    # predictors = np.add(diff1, diff2)
-    # predictors = np.add(predictors, diff3)
-
-   #np.d
-
-    # predictors = predictors - np.mean(predictors)
-    # predictors = predictors / np.max(predictors)
-    # #
-    # print("normalized" + str(predictors))
-
-    #predictors = normalize(predictors, axis=1)
-    #predictors = normalize(predictors, axis=1)
-
-    #print("first"+str(testnpy[0,1]))
-
-    #scaler = MaxAbsScaler()
-    #scaler.fit(testnpy)
-    #predictors = scaler.transform(testnpy)
-
-    #predictors = np.log(testnpy)
-    #print("log test:"+str(predictors)) #This just breaks the data by outputing NANs for negatives
-
-    #return predictors.flatten()
-    return testnpy.flatten()
+   #print("return end:"+ str(return_value[12287]))
+    return detector_readings.flatten()
 
 def import_flat_testing_sample(sample_name):
 
@@ -180,12 +129,11 @@ def import_flat_testing_sample(sample_name):
 
 #this takes a list of sample names and imports them
 def import_list_of_flat_training_samples(sample_name_list):
-    #We create an empty dataframe
     numpy_arrays_list = []
     df = pd.DataFrame()
 
+
     for sample in sample_name_list:
-        #print("...")
         numpy_arrays_list.append(import_flat_training_sample(sample))
 
     #this appends all the rows of numpy arrays list to the dataframe
@@ -202,60 +150,32 @@ def import_list_of_flat_testing_samples(sample_name_list):
         numpy_arrays_list.append(import_flat_testing_sample(sample))
     #this appends all the rows of numpy arrays list to the dataframe
     df = df.append(pd.DataFrame(numpy_arrays_list))
-    #df.append(pd.DataFrame(numpy_arrays_list))
     return df
 
 
 def import_number_of_flat_testing_samples(starting_number, ending_number):
     targets_df = tg.import_testing_targets()
     sample_name_list = []
-
     # get the list of sample names for the range
     for entry in range(starting_number,ending_number):
         sample_name_list.append(targets_df["id"].values[entry])
-    #print(sample_name_list)
-    #return normalise_data( import_list_of_flat_testing_samples(sample_name_list) )
     return import_list_of_flat_testing_samples(sample_name_list)
 
-
-#by selecting a starting point and an end point the user can select a range of samples
-def import_number_of_flat_training_samples(starting_number, ending_number):
-    targets_df = tg.import_training_targets()
-    sample_name_list = []
-
-    # get the list of sample names for the range
-    for entry in range(starting_number,ending_number):
-        sample_name_list.append(targets_df["id"].values[entry])
-    #print(sample_name_list)
-    #return normalise_data(import_list_of_flat_training_samples(sample_name_list))
-    return import_list_of_flat_training_samples(sample_name_list)
-
-
-
-
-
-
 def import_many_flat_samples_add_targets(starting_number, ending_number):
-    print("Importing many samples")
     targets_df = tg.import_training_targets()
-    #print(targets_df.head())
-
     sample_name_list = []
     target_list = []
 
-    print("appending targets")
+    #print("appending targets")
     #get the list of sample names for the range
-    for entry in range(starting_number,ending_number):
-        sample_name_list.append(targets_df["id"].values[entry])
-        target_list.append(targets_df["target"].values[entry])
+    for entry in range(starting_number,ending_number+1):
+        #print("Entry : Target : ID" , str(entry), str(targets_df["target"].iloc[entry]) ,str(targets_df["id"].iloc[entry]))
+        sample_name_list.append(targets_df["id"].iloc[entry])
+        target_list.append(targets_df["target"].iloc[entry])
 
-        #print(str(targets_df["id"].values[entry])+" "+ str(targets_df["target"].values[entry]))
-
-
-    print("import_list_of_flat_samples")
     samples_df = import_list_of_flat_training_samples(sample_name_list)
     samples_df["target"] = target_list
-    print(samples_df)
+    samples_df["id"] = sample_name_list
     return samples_df
 
 
@@ -263,33 +183,6 @@ def import_many_flat_samples_add_targets(starting_number, ending_number):
 def import_single_samples_of_number(number):
     targets_df = tg.import_training_targets()
     return targets_df["id"].values[number]
-
-
-
-
-def peak_counter_evolope(an_array):
-    count =0
-    envelope_points = []
-
-    for i in range(1 ,len(an_array)-1):
-        if an_array[i] > an_array[i-1]:
-            if an_array[i] > an_array[i+1]:
-                for x range
-
-
-                count+=1
-    return count, envelope_points
-
-def trough_counter(an_array):
-    count =0
-    envelope_points =[]
-
-    for i in range(1 ,len(an_array)-1):
-        if an_array[i] < an_array[i-1]:
-            if an_array[i] < an_array[i+1]:
-                count+=1
-
-    return count, envelope_points
 
 
 

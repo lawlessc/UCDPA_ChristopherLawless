@@ -13,17 +13,13 @@ def analysis_of_data():
     print(df.columns)
     print(df.head)
 
-
 def analysis_of_targets():
      df =tg.import_training_targets()
-
      print(df.shape)
      print(df.columns)
      print(df.head)
      counts = df['target'].value_counts()
-
      plt.ylabel("number of values")
-
      plt.hist(counts, bins=3, histtype='bar')
      plt.show()
 

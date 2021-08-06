@@ -1,23 +1,15 @@
 import keras
 import pandas as pd
-from keras.layers import Dense, Dropout,RNN, SimpleRNN,GRU,LSTM ,Reshape
+from keras.layers import Dense, Dropout,RNN, SimpleRNN,GRU,LSTM ,Reshape ,GaussianNoise, Resizing
 from keras.layers.advanced_activations import LeakyReLU ,PReLU,ELU
-from keras.regularizers import l2
 from keras.utils.np_utils import to_categorical
 from keras.models import load_model ,Sequential
-from keras.optimizers import SGD ,Adam
-from keras.constraints import maxnorm
 from keras.callbacks import EarlyStopping
-from sklearn import preprocessing
 from sklearn.preprocessing import StandardScaler
 from keras import layers
 
-from keras.layers import Conv1D
-from keras.layers import Conv2D
-from keras.layers import Conv2D
 #Made by Christopher Lawless July 2021
 
-import matplotlib.pyplot as plt
 from datetime import datetime
 import visualisers as vs
 
@@ -29,26 +21,46 @@ class NN_definer:
     def create_model(self, first_layer, dropout, decay, hidden_layers, layer_widths, optimizer, winit):
         model = Sequential()
 
-        #model.add(Reshape((4096, 3), input_shape=(12288,)))
-        if dropout > 0:
-           model.add(Dropout(dropout,  input_shape=(12288,))) #This might overkill considering the dataset is already full of noise
-        # model.add(LeakyReLU(first_layer,input_shape=(12288,)))
-        model.add(LeakyReLU(first_layer, input_shape=(12288,)))
+        model.add(Dense(first_layer,input_shape=(12288,),activation="relu",kernel_initializer=winit))
+       # model.add(Dense(first_layer, input_shape=(12288,), activation="relu", kernel_initializer=winit))
+        #model.add(LeakyReLU(first_layer, input_shape=(12288,)))
         # model.add(Dropout(dropout))
-        #model.add(SimpleRNN(units=first_layer, input_shape=(4096, 3), activation="relu", return_sequences=True,
-        #                    kernel_regularizer=l2(decay), recurrent_regularizer=l2(decay), bias_regularizer=l2(decay)))
-        # model.add(Dense(layer_widths, activation="relu", input_shape=(12288,) ,kernel_initializer=winit))
-        # model.add(Dense(layer_widths, activation="sigmoid",input_shape=(12288,) ,kernel_initializer=winit))
+        #model.add(SimpleRNN(units=first_layer, input_shape=(3, 4096), activation="relu", return_sequences=False,kernel_initializer=winit))
+                           # kernel_regularizer=l2(decay), recurrent_regularizer=l2(decay), bias_regularizer=l2(decay)))
         for x in range(hidden_layers):
             model.add(LeakyReLU(layer_widths))
-            # model.add(LSTM(layer_widths))
-            # model.add(Dense(hidden_layer_width, activation="relu"))
-            # model.add(Dense(layer_widths, activation="sigmoid"))
+            model.add(Dense(int(layer_widths),activation="relu", kernel_initializer=winit))
+    #model.add(Dense(3, activation="relu", kernel_initializer=winit))
+        model.add(Dense(1, activation="sigmoid", kernel_initializer=winit))
+
+        model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=["accuracy"])
+        return model
+
+    def create_ensemble_model(self, first_layer, dropout, decay, hidden_layers, layer_widths, optimizer, winit):
+        model = Sequential()
+        # model.add(Reshape((4096, 3), input_shape=(12288,)))
+        #if dropout > 0:
+            #model.add(Dropout(dropout, input_shape=(12288,)))  # This might overkill considering the dataset is already full of noise
+        model.add(LeakyReLU(first_layer, input_shape=(12288+5,)))
+        # model.add(Dropout(dropout))
+        for x in range(hidden_layers):
+            model.add(LeakyReLU(layer_widths))
+
+        #model.add(LeakyReLU(4))
+        #model.add(Dense(2, activation="sigmoid"))
         model.add(Dense(2, activation="softmax"))
-        # model.add(Dense(1, activation="sigmoid"))
         # model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=["accuracy"])
         model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=["accuracy"])
         return model
+
+
+
+
+
+
+
+
+
 
     def define_model(self, data, hidden_layers, hidden_layer_width):
         model = Sequential()
@@ -74,16 +86,12 @@ class NN_definer:
         print("compile Model")
         return model
 
-
-
-
-
     def compile_model(self,model ,optimizer):
         model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=["accuracy"])
         return model
 
 
-    def fit_model(self,data, model,epoch_batch_size):
+    def fit_model(self,data,epochs ,model,epoch_batch_size):
         print("fit model")
         predictors = data.drop(["target"],axis=1).to_numpy()#.as_matrix()
         #targets = to_categorical(data.target)
@@ -97,7 +105,7 @@ class NN_definer:
 
         early_stopping_monitor= EarlyStopping(patience=14,monitor="val_accuracy")
 
-        mt =model.fit(predictors,data.target.to_numpy(), epochs=100,batch_size=epoch_batch_size ,
+        mt =model.fit(predictors,data.target.to_numpy(), epochs=epochs,batch_size=epoch_batch_size ,
                       validation_split = 0.25,callbacks=[early_stopping_monitor])#
 
         mlist = [mt]
@@ -126,7 +134,7 @@ class NN_definer:
 
 
 
-    def make_prediction_with(self,model_name,data_to_predict_with):
+    def make_single_prediction_with(self,model_name,data_to_predict_with):
         loaded_model = load_model(model_name)
         predictions = pd.DataFrame()
         probability_true =[]
@@ -139,6 +147,21 @@ class NN_definer:
 
         for prediction in probability_true:
             print(prediction)
+
+    def make_single_prediction_with_model(self, model, data_to_predict_with):
+       # loaded_model = load_model(model_name)
+        predictions = pd.DataFrame()
+        probability_true = []
+
+        for index, row in data_to_predict_with.iterrows():
+            predictions = model.predict((pd.DataFrame(row).T).values)
+            print(pd.DataFrame(row).T)
+            probability_true.append(predictions[:, 1])
+
+        for prediction in probability_true:
+            print(prediction)
+
+
 
 
     def retrain_model(self,model_name,data):
