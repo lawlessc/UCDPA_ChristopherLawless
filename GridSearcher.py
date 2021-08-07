@@ -84,12 +84,12 @@ class GridSearcher:
         model = KerasClassifier(build_fn=self.neuralnet_d.create_model)
 
         param_grid =  {"epochs": [50,75],
-                      "first_layer": [4],
-                      "hidden_layers": [1],
-                      "layer_widths": [3],
+                      "first_layer": [3,4,5],
+                      "hidden_layers": [1,2],
+                      "layer_widths": [3,4],
                       "optimizer": ["sgd"],
                       "winit": ["glorot_normal"],
-                      "batch_size": [2,10,128,1000],
+                      "batch_size": [128,1000],
                       "dropout": [0],
                       "decay": [0.01]
                       }

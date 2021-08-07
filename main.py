@@ -47,7 +47,7 @@ print(f'Made by Christopher Lawless July 2021')
 
 
 samples.import_test()
-data = samples.import_many_flat_samples_add_targets(0, 4000)
+data = samples.import_many_flat_samples_add_targets(0, 7000)
 
 print("imported")
 print(data)

@@ -14,6 +14,20 @@ from scipy.fft import irfft
 from sklearn.decomposition import PCA
 
 
+import noisereduce as nr
+#Added citation
+# @software{tim_sainburg_2019_3243139,
+#   author       = {Tim Sainburg},
+#   title        = {timsainb/noisereduce: v1.0},
+#   month        = jun,
+#   year         = 2019,
+#   publisher    = {Zenodo},
+#   version      = {db94fe2},
+#   doi          = {10.5281/zenodo.3243139},
+#   url          = {https://doi.org/10.5281/zenodo.3243139}
+# }
+
+
 
 #just a test on a single file, shows 3 rows, 4096 columns
 #These rows correspond to the 3 detectors.
@@ -42,7 +56,7 @@ def import_flat_training_sample(sample_name):
     #doing this beacause i think scientific notation was messing with everything.
     #Manual scaling
     bignum  = 100000000000000000000
-    bignum2 = 1000000000000000000000*0.4
+    bignum2 = 1000000000000000000000*0.3
 
     detector_readings[0,:] =   np.multiply(bignum, detector_readings[0,:])
     detector_readings[1, :] =  np.multiply(bignum, detector_readings[1, :])
@@ -50,12 +64,36 @@ def import_flat_training_sample(sample_name):
 
     #testnpy[2, :] = np.negative(testnpy[2, :])#maybe the location of the virgo array means flipping this will help
     detector_readings[2, :] = np.negative(detector_readings[2, :])
+    #detector_readings[2, :] = np.roll(detector_readings[2, :], 2048, axis=0)
     #testnpy[1, :] = np.negative(testnpy[1, :])
+
+    #detector_mean = np.mean([detector_readings[0,:],detector_readings[1,:],detector_readings[2,:]],
+                           # axis =0 , dtype=np.float64)
+
+
+    #detector_readings[0,:]  = nr.reduce_noise(y=detector_readings[0,:], sr=20000,stationary=True)
+    detector_readings = nr.reduce_noise(y=detector_readings, sr=20000, stationary=True)
+    #detector_readings[1, :] = nr.reduce_noise(y=detector_readings[1, :], sr=20000, stationary=True)
+    #detector_readings[2, :] = nr.reduce_noise(y=detector_readings[2, :], sr=20000, stationary=True)
+
+    detector_mean = np.mean([detector_readings[0, :], detector_readings[1, :], detector_readings[2, :]],
+                             axis =0 , dtype=np.float64)
+
+
+    #print(detector_mean)
+
+   # print(len(detector_mean))
+
+    #detector_mean =detector_mean.reshape(1,-1)
+
+    #predictor_scaler = StandardScaler().fit(detector_mean)
+    #detector_mean = predictor_scaler.transform(detector_mean)
 
     #predictor_scaler = StandardScaler().fit(detector_readings)
     #detector_readings = predictor_scaler.transform(detector_readings)
 
-    vs.spectralplot(self=vs,data=detector_readings[1,:])
+
+    #vs.spectralplot(self=vs,data=detector_mean)
 
 
 
@@ -108,9 +146,9 @@ def import_flat_training_sample(sample_name):
 
 
     #vs.fftPlot(self=vs,xf=xf1,yf=yf1)
-
-    #signal_list = [detector_readings[0,:],detector_readings[1,:],detector_readings[2,:]]#,testnpy[1,:],testnpy[2,:]]
-    #vs.signal_plotter(self=vs ,signals_list=  signal_list)
+    print("x------------------")
+    signal_list = [detector_readings[0,:],detector_readings[1,:],detector_readings[2,:],detector_mean]#,testnpy[2,:]]
+    vs.signal_plotter(self=vs ,signals_list=  signal_list)
 
 
 

@@ -21,15 +21,15 @@ class NN_definer:
     def create_model(self, first_layer, dropout, decay, hidden_layers, layer_widths, optimizer, winit):
         model = Sequential()
 
-        model.add(Dense(first_layer,input_shape=(12288,),activation="relu",kernel_initializer=winit))
+        #model.add(Dense(first_layer,input_shape=(4096,),activation="relu",kernel_initializer=winit))
        # model.add(Dense(first_layer, input_shape=(12288,), activation="relu", kernel_initializer=winit))
-        #model.add(LeakyReLU(first_layer, input_shape=(12288,)))
+        model.add(LeakyReLU(first_layer, input_shape=(12288,)))
         # model.add(Dropout(dropout))
         #model.add(SimpleRNN(units=first_layer, input_shape=(3, 4096), activation="relu", return_sequences=False,kernel_initializer=winit))
                            # kernel_regularizer=l2(decay), recurrent_regularizer=l2(decay), bias_regularizer=l2(decay)))
         for x in range(hidden_layers):
             model.add(LeakyReLU(layer_widths))
-            model.add(Dense(int(layer_widths),activation="relu", kernel_initializer=winit))
+            #model.add(Dense(int(layer_widths),activation="relu", kernel_initializer=winit))
     #model.add(Dense(3, activation="relu", kernel_initializer=winit))
         model.add(Dense(1, activation="sigmoid", kernel_initializer=winit))
 
