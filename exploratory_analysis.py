@@ -18,6 +18,6 @@ def analysis_of_targets():
     print(df.head)
     counts = df['target'].value_counts()
     plt.ylabel("number of values")
-    plt.hist(counts, bins=3, histtype='bar')#
+    plt.bar(["0","1"], height=counts, width=0.5 , color=["b","g"])
     plt.show()
 

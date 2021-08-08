@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import get_ligo_path as gp
 import import_targets as tg
+import visualisers as vs
 from sklearn import preprocessing
 
 
@@ -10,12 +11,14 @@ from sklearn import preprocessing
 #These rows correspond to the 3 detectors.
 def import_test():
     '''This just imports one specific hardcoded file to confirm things are working'''
-    testnpy = np.load("data/train/0/0/0/00000e74ad.npy")
+    sample = np.load("data/train/0/0/0/00000e74ad.npy")
     print("import_test():")
-    print(testnpy[0,0])
-    print(type(testnpy))
-    print(testnpy.shape)
-    return testnpy
+    print(sample[0,0])
+    print(type(sample))
+    print(sample.shape)
+    signal_list=[sample[0,:],sample[1,:],sample[2,:]]
+    vs.signal_plotter(self=vs,signals_list= signal_list)
+    return sample
 
 def import_single_sample(sample_name):
     '''This imports a single sample as a data frame'''

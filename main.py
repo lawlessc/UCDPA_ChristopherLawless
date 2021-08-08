@@ -2,23 +2,20 @@ import pandas as pd
 import import_ligo_samples as samples
 import kaggle_download as kg
 import exploratory_analysis as ex
-import hyper_parameter_opto as tr
+import hyper_parameter_opto as hp
 import grid_searcher as gr
 import NN_definer as nnd
-# This is a sample Python script.
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 print(f'Made by Christopher Lawless July 2021')
 
 #testlist= ["00000e74ad","c00a5bd72f","f31a3199d0"]
 #samples.import_list_of_flat_samples(testlist)
 
-#ex.analysis_of_targets()
+ex.analysis_of_targets()
 
-neuralnet_d = nnd.NN_definer()
+#neuralnet_d = nnd.NN_definer()
 
-#training
+
 
 samples.import_test()
 
@@ -34,22 +31,11 @@ gs = gr.grid_searcher()
 gs.do_search(data, describe=True)
 
 
+#test_model = neuralnet_d.create_model()
 
 
-
-
-test_model = neuralnet_d.create_model()
-
-
-
-
-
-#trainer = tr.hyper_paramenter_training()
+#trainer = hp.hyper_paramenter_training()
 #trainer.train_network(data)
-
-
-
-
 
 #Testing
 #df_test_data =samples.import_number_of_flat_testing_samples(4,100)
