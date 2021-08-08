@@ -1,6 +1,5 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-
 import import_ligo_samples as lg
 import import_targets as tg
 

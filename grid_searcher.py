@@ -1,15 +1,11 @@
 import numpy
 from keras.optimizers import SGD ,Adam, RMSprop
+import keras.utils as ku
 import pandas as pd
 import numpy as np
 import tensorflow as tf
-from sklearn.model_selection import train_test_split
-from sklearn.model_selection import GridSearchCV
-from keras.models import Sequential
-from keras.layers import Dense
 from keras.wrappers.scikit_learn import KerasClassifier
-from sklearn.model_selection import GridSearchCV
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GridSearchCV,train_test_split
 from sklearn.preprocessing import StandardScaler, MinMaxScaler,RobustScaler,MaxAbsScaler
 from keras.utils.np_utils import to_categorical
 from sklearn.decomposition import PCA
@@ -25,91 +21,71 @@ class grid_searcher:
 
     def do_search(self,data , describe=False):
         '''This takes a  single dataframe as input and does a gridsearch , you can also set it to print information on the dataframe'''
-
         if describe == True:
             #print(data.describe())
             print(data.head())
 
-        tf.keras.backend.set_floatx("float32") # I did this because the Ligo Data are 64 bit floats.
-        print("keras data type" + tf.keras.backend.floatx())
-
-        tf.device("cpu:0")#I added this try out and found it faster than overpriced GPU
-
-        #policy = mixed_precision.Policy('mixed_float16')
-        #mixed_precision.set_global_policy(policy)
-
+        #These remove the Target and ID columns for the dataframe.
         data_ = data.drop(["target"], axis=1)
-        data_= data_.drop(["id"], axis=1)
-
+        data_ = data_.drop(["id"], axis=1)
         predictors = data_.to_numpy()
 
-        #print("grid")
-        #print(str(predictors.shape[0]))
-        #print(str(predictors.shape[1]))
+        tf.keras.backend.set_floatx("float32") # I did this because the Ligo Data are 64 bit floats.
+        print("keras data type" + tf.keras.backend.floatx())
+        #tf.device("cpu:0")#I added this try rule out GPU issues
 
-      #  print("grid")
-       # print(predictors))
-
-
-
-
-        #print("value func"+str( data_.values))
-        #print("to_numpy" + str(predictors))
 
 
 
         model = KerasClassifier(build_fn=self.neuralnet_d.create_model)
+        opto_ssg1 = SGD(learning_rate=0.000001)
+        opto_ssg2 = SGD(learning_rate=0.0000001)
+        opto_ssg3 = SGD(learning_rate=0.00000001)
 
-        opto = SGD(learning_rate= 0.001)
+        #I am printing these because Gridsearch does not output their instance names
+        # but only outputs their memory location e.g "0x000001FBDE926B70"
 
-        param_grid =  {"epochs": [55],
-                      "first_layer": [3,4,10,20,5],
+
+        param_grid =  {"epochs": [25],
+                      "first_layer": [75],
                       "hidden_layers": [1,2],
-                      "layer_widths": [3,4,5],
-                      "optimizer": [opto],
-                      "winit": ["glorot_normal"],
-                      "batch_size": [32,128,2],
+                      "layer_widths": [10],
+                      "cnn_window_size":[32],
+                      "optimizer": [opto_ssg2],
+                      "winit": ["random_uniform"],
+                      "batch_size": [128],
                       "dropout": [0.01],
                       "decay": [0.01]
                       }
 
         grid = GridSearchCV(estimator=model,param_grid= param_grid, n_jobs= 1, cv=2,verbose=3)
 
-        #print(data.target.values)
-        #targets = np.flip(data.target.values)
-        #print(targets)
-
-        # detector_readings[2, :] = np.flip(detector_readings[2, :])
-
-
-        #targets = to_categorical(data.target)
-
-        X_train, X_test, y_train, y_test =train_test_split(predictors, data.target.to_numpy() ,shuffle=False)#test sets are empty because i am testing in gridsearch
+        targets = to_categorical(data.target.to_numpy())
+        X_train, X_test, y_train, y_test =train_test_split(predictors, targets ,shuffle=False)#test sets are empty because i am testing with cross validation in gridsearch
 
         predictor_scaler = MinMaxScaler().fit(X_train)
         X_train = predictor_scaler.transform(X_train)
 
         results = grid.fit(X_train,y_train)
-
-
         print("Best Score: %f " ,results.best_score_)
         print("Best Parameters: %s" , results.best_params_)
+
+        print("Optimizer1:"+str(opto_ssg1))
+        print("Optimizer2:" + str(opto_ssg2))
+        print("Optimizer3:" + str(opto_ssg3))
+
 
 
 
 
     def do_ensemble_search(self, data):
-        '''This is incomplete but is to perform a grid search for training ensemble networks'''
+        '''This is incomplete but is to perform a grid search for training ensemble networks, it takes in a pandaframe of the training data'''
         predictors = data.drop(["target"], axis=1).to_numpy()
-        # predictor_scaler = StandardScaler().fit(predictors)
-        # predictors = predictor_scaler.transform(predictors)
-        # predictors.reshape(2,3,2)
-
         model = KerasClassifier(build_fn=self.neuralnet_d.create_model,)
 
         param_grid = {"epochs": [1,2,3,4,5,10,11,100],
                       "first_layer": [10,200],
-                      "hidden_layers": [1, 2],
+                      "hidden_layers": [1],
                       "layer_widths": [10],
                       "optimizer": ["adam"],
                       "winit": ["normal"],
@@ -119,7 +95,6 @@ class grid_searcher:
                       }
 
         grid = GridSearchCV(estimator=model, param_grid=param_grid, n_jobs=1, cv=2, verbose=3)
-
         results = grid.fit(predictors, data.target.values)
 
         print("Best Score: %f ", results.best_score_)

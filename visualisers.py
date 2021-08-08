@@ -12,8 +12,6 @@ def validation_plot(self ,model_list):
         plt.plot(model.history["loss"], 'r' ,  label="loss")
         plt.plot(model.history["val_loss"] ,'b', label="validation loss")
 
-
-
     plt.xlabel('Epochs')
     plt.ylabel('Validation score')
     plt.legend()
@@ -47,27 +45,11 @@ def signal_plotter(self, signals_list):
 #The blackhole colission should be represented by a high rising frequency so maybe FFT can remove it.
 #I learnt to use this here https://realpython.com/python-scipy-fft/
 def fftPlot(self, data):
-    '''This plots a fast fourrier transform of the sample'''
+    '''This plots a fast fourrier transform of a sample'''
     y = rfft(data)
     x = rfftfreq(4096, 1 / 2048)
     plt.xlabel("Frequency")
-    #plt.plot(x,y)
-
-    points_per_freq = len(x) / (2048 / 2)
-    for frequency in range(600,1500):
-         target = int(points_per_freq * frequency)
-         y[target - 1: target + 2] = 0
-    y = irfft(y)
-
-    # for frequency in range(3500,4000):
-    #      target = int(points_per_freq * frequency)
-    #      y[target - 1: target + 2] = 0
-    # y = rfft(y)
-    plt.plot(y)
-
-
-
-
+    plt.plot(x,y)
     plt.show()
 
 
