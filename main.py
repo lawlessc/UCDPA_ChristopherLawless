@@ -20,12 +20,14 @@ neuralnet_d = nnd.NN_definer()
 
 #training
 
-
-
 samples.import_test()
 
 
-data = samples.import_flat_samples_add_targets(0,3000)
+#For large amounts of data beyond 10,000 this can take a while to load
+data = samples.import_flat_samples_add_targets(0,500)
+#data can also be loaded in chunks and appended to the dataframe
+#data = data.append(samples.import_many_flat_samples_add_targets(20000, 20060))
+
 print(data)
 
 gs = gr.grid_searcher()
@@ -33,7 +35,7 @@ gs.do_search(data, describe=True)
 
 
 
-#data = data.append(samples.import_many_flat_samples_add_targets(20000, 20060))
+
 
 
 test_model = neuralnet_d.create_model()

@@ -30,9 +30,6 @@ def import_flat_training_sample(sample_name):
     #The first 3 also represent the path characters represent
     detector_readings = np.load(gp.get_path_training(sample_name),allow_pickle=True,fix_imports=True).astype(np.float32)
     #detector_readings[2, :] = np.negative(detector_readings[2, :])#i inverted this signal as it's on the otherside of the world to the other detectors.
-    #detector_readings[0, :] = normalize(detector_readings[0, :])
-    #detector_readings[1, :] = normalize(detector_readings[1, :])
-    #detector_readings[2, :] = normalize(detector_readings[2, :])
     #print(detector_readings)
     return detector_readings.flatten()
 
