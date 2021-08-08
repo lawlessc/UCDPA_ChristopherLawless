@@ -49,7 +49,7 @@ print(f'Made by Christopher Lawless July 2021')
 samples.import_test()
 gs = gr.grid_searcher()
 
-data = samples.import_flat_samples_add_targets(0, 15000)
+data = samples.import_flat_samples_add_targets(0,6200)
 
 #print("imported")
 print(data)

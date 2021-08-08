@@ -51,7 +51,7 @@ def import_flat_training_sample(sample_name):
     #print("import_flat_training_sample")
     #samples names are hex numbers in the targets file
     #The first 3 also represent the path characters represent
-    detector_readings = np.load(gp.get_path_training(sample_name))
+    detector_readings = np.load(gp.get_path_training(sample_name),allow_pickle=True,fix_imports=True).astype(np.float32)
     #np.set_printoptions(threshold=np.inf)
 
     #print(detector_readings)
@@ -178,8 +178,11 @@ def import_list_of_flat_training_samples(sample_name_list):
     for sample in sample_name_list:
         numpy_arrays_list.append(import_flat_training_sample(sample))
     #this appends all the rows of numpy arrays list to the dataframe
+
+    print(numpy_arrays_list)
+
     df = df.append(pd.DataFrame(numpy_arrays_list))
-    #print(df)
+    print(df)
     #df.append(pd.DataFrame(numpy_arrays_list))
     return df
 

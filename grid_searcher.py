@@ -30,7 +30,7 @@ class grid_searcher:
             #print(data.describe())
             print(data.head())
 
-        tf.keras.backend.set_floatx("float64") # I did this because the Ligo Data are 64 bit floats.
+        tf.keras.backend.set_floatx("float32") # I did this because the Ligo Data are 64 bit floats.
         print("keras data type" + tf.keras.backend.floatx())
 
         tf.device("cpu:0")#I added this try out and found it faster than overpriced GPU
@@ -60,13 +60,15 @@ class grid_searcher:
 
         model = KerasClassifier(build_fn=self.neuralnet_d.create_model)
 
-        param_grid =  {"epochs": [100,50],
-                      "first_layer": [10,20,100],
-                      "hidden_layers": [1],
-                      "layer_widths": [30],
-                      "optimizer": ['SGD', 'RMSprop', 'Adagrad', 'Adadelta', 'Adam', 'Adamax', 'Nadam'],
+        opto = SGD(learning_rate= 0.001)
+
+        param_grid =  {"epochs": [55],
+                      "first_layer": [3,4,10,20,5],
+                      "hidden_layers": [1,2],
+                      "layer_widths": [3,4,5],
+                      "optimizer": [opto],
                       "winit": ["glorot_normal"],
-                      "batch_size": [32],
+                      "batch_size": [32,128,2],
                       "dropout": [0.01],
                       "decay": [0.01]
                       }

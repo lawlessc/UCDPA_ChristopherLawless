@@ -6,12 +6,14 @@
 # initially i tried to do this with regex, it was easier not to use regex
 def get_path(ligo_filename):
     first_three= ligo_filename[0:3]
+    print(first_three)
     file_path = first_three[0]+"/"+first_three[1]+"/"+first_three[2]+"/"+ligo_filename+".npy"
-    #print(file_path)
+    print(file_path)
     return file_path
 
 def get_path_training(value):
     file_path = "data/train/"+ get_path(value)
+    print(file_path)
     return file_path
 
 def get_path_testing(value):

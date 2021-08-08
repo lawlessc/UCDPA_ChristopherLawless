@@ -30,7 +30,7 @@ class NN_definer:
         this is mainly for use with GridSearchCV but can be used discretely'''
         model = Sequential()
         model.add(Reshape((12288, 1), input_shape=(12288,)))
-        model.add(Conv1D(first_layer,10, activation='relu', input_shape=(122881, 1),kernel_initializer=winit))
+        model.add(Conv1D(first_layer,128, activation='softmax', input_shape=(12288, 1),kernel_initializer=winit))
         #model.add(Conv1D(100, 10, activation='relu'))
         #model.add(Conv1D(30, 10, activation='relu'))
         #model.add(Dropout(dropout))
@@ -43,9 +43,10 @@ class NN_definer:
         #model.add(SimpleRNN(units=first_layer, input_shape=(3, 4096), activation="relu", return_sequences=False,kernel_initializer=winit))
                            # kernel_regularizer=l2(decay), recurrent_regularizer=l2(decay), bias_regularizer=l2(decay)))
         for x in range(hidden_layers):
-            model.add(LeakyReLU(layer_widths))
-            #model.add(Dense(int(layer_widths),activation="relu", kernel_initializer=winit))
+            #model.add(LeakyReLU(layer_widths))
+            model.add(Dense(int(layer_widths),activation="relu", kernel_initializer=winit))
 
+        #model.add(LeakyReLU(1))
         model.add(Dense(1, activation="sigmoid"))
 
 
