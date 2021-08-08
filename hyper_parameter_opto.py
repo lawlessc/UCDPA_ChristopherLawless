@@ -10,7 +10,7 @@ from sklearn.model_selection import GridSearchCV
 
 import NN_definer as nnd
 
-class hyper_paramenter_training:
+class hyper_parameter_opto:
 
 
     best_model = None

@@ -5,8 +5,8 @@ import import_ligo_samples as samples
 import import_targets as tg
 #import kaggle_download as kg
 import exploratory_analysis as ex
-import HyperParameterOpto as tr
-import GridSearcher as gr
+import hyper_parameter_opto as tr
+import grid_searcher as gr
 
 # This is a sample Python script.
 
@@ -47,9 +47,11 @@ print(f'Made by Christopher Lawless July 2021')
 
 
 samples.import_test()
-data = samples.import_many_flat_samples_add_targets(0, 7000)
+gs = gr.grid_searcher()
 
-print("imported")
+data = samples.import_flat_samples_add_targets(0, 15000)
+
+#print("imported")
 print(data)
 #data = data.append(samples.import_many_flat_samples_add_targets(20000, 20060))
 
@@ -57,8 +59,8 @@ print(data)
 #trainer = tr.hyper_paramenter_training()
 #trainer.train_network(data)
 
-gs = gr.GridSearcher()
-gs.do_search(data)
+
+gs.do_search(data, describe=True)
 
 
 #Testing
