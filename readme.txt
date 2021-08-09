@@ -24,7 +24,7 @@ Keras (Neural Networks)
 TensorFlow (Backend for building and training Neural Networks)
 Matplotlib (visualizers)
 Matplotlib.pyplot  (visualizers)
-Kaggle  (Retrieving Competition Data)
+Kaggle  (Retrieving Competition Data, You will need an API key setup to use this.)
 
 This project is also using Python Version 3.7 and CUDA
 
