@@ -60,6 +60,8 @@ class HyperParameterOpto:
             self.best_model = model
             self.best_accuracy = history.history["val_accuracy"]
 
+        # This if statement is discrete from the others the statement below it will attempt to evaluate a NoneType and
+        # crash
         if self.best_accuracy is None:
             self.best_accuracy = history.history["val_accuracy"]
 

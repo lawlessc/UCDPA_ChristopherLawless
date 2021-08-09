@@ -3,7 +3,7 @@ from keras.models import Sequential
 
 
 class Ensemble:
-    """ This class was to be for holding an ensemble model"""
+    """ This class was to be for holding an ensemble model,this is incomplete for now so don't use it."""
 
     model_list = []
     output_model = Sequential()  # just a placeholder model

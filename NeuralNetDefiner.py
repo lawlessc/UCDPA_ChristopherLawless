@@ -1,4 +1,6 @@
 import keras
+import pandas as pd
+from keras.utils.np_utils import to_categorical
 from keras.layers import Dense, Flatten, Dropout,Reshape, Conv1D, MaxPooling1D
 from keras.layers.advanced_activations import LeakyReLU, PReLU, ELU
 from keras.models import load_model, Sequential
@@ -6,6 +8,7 @@ from keras.callbacks import EarlyStopping
 from sklearn.preprocessing import StandardScaler
 from datetime import datetime
 import tensorflow as tf
+import visualisers as vs
 
 
 # Made by Christopher Lawless July 2021
@@ -160,52 +163,51 @@ class NeuralNetDefiner:
         print("Loss: " + self.model.loss)
         model.summary()
 
-    # def make_single_prediction_with(self,model_name,data_to_predict_with):
-    #     loaded_model = load_model(model_name)
-    #     predictions = pd.DataFrame()
-    #     probability_true =[]
-    #
-    #     for index ,row in data_to_predict_with.iterrows():
-    #         #print(row)
-    #         predictions = loaded_model.predict((pd.DataFrame(row).T).values)
-    #         print(pd.DataFrame(row).T)
-    #         probability_true.append(predictions[:,1])
-    #
-    #     for prediction in probability_true:
-    #         print(prediction)
-    #
-    # def make_single_prediction_with_model(self, model, data_to_predict_with):
-    #    # loaded_model = load_model(model_name)
-    #     predictions = pd.DataFrame()
-    #     probability_true = []
-    #
-    #     for index, row in data_to_predict_with.iterrows():
-    #         predictions = model.predict((pd.DataFrame(row).T).values)
-    #         print(pd.DataFrame(row).T)
-    #         probability_true.append(predictions[:, 1])
-    #
-    #     for prediction in probability_true:
-    #         print(prediction)
-    #
-    #
-    #
-    #
-    # def retrain_model(self,model_name,data):
-    #     loaded_model = load_model(model_name)
-    #
-    #     predictors = data.drop(["target"], axis=1).values  # .as_matrix()
-    #     targets = to_categorical(data.target)
-    #
-    #     print(data.target.values)
-    #     print(predictors)
-    #
-    # mt = self.model.fit(predictors, data.target.values, epochs=1000, validation_split=0.10)  # ,
-    # use_multiprocessing=True) This seems to be only for training large pools of models
-    #
-    #     # early_stopping_monitor= EarlyStopping(patience=2)
-    #     # self.model.fit(predictors,target,validation_split = 0.3,nb_epoch=20
-    #     # ,callbacks=[early_stopping_monitor])
-    #     mlist = [mt]
-    #     vs.validation_plot(self=vs, model_list=mlist)
-    #     vs.accuracy_plot(self=vs, model_list=mlist)
-    #     self.save_model()
+    def make_single_prediction_with(self,model_name,data_to_predict_with):
+        loaded_model = load_model(model_name)
+        predictions = pd.DataFrame()
+        probability_true =[]
+
+        for index ,row in data_to_predict_with.iterrows():
+            #print(row)
+            predictions = loaded_model.predict((pd.DataFrame(row).T).values)
+            print(pd.DataFrame(row).T)
+            probability_true.append(predictions[:,1])
+
+        for prediction in probability_true:
+            print(prediction)
+
+    def make_single_prediction_with_model(self, model, data_to_predict_with):
+       # loaded_model = load_model(model_name)
+        predictions = pd.DataFrame()
+        probability_true = []
+
+        for index, row in data_to_predict_with.iterrows():
+            predictions = model.predict((pd.DataFrame(row).T).values)
+            print(pd.DataFrame(row).T)
+            probability_true.append(predictions[:, 1])
+
+        for prediction in probability_true:
+            print(prediction)
+
+
+
+
+    def retrain_model(self,model_name,data):
+        loaded_model = load_model(model_name)
+
+        predictors = data.drop(["target"], axis=1).values  # .as_matrix()
+        targets = to_categorical(data.target)
+
+        print(data.target.values)
+        print(predictors)
+
+        mt = self.model.fit(predictors, data.target.values, epochs=1000, validation_split=0.10)  # ,use_multiprocessing=True) This seems to be only for training large pools of models
+
+        # early_stopping_monitor= EarlyStopping(patience=2)
+        # self.model.fit(predictors,target,validation_split = 0.3,nb_epoch=20
+        # ,callbacks=[early_stopping_monitor])
+        mlist = [mt]
+        vs.validation_plot(self=vs, model_list=mlist)
+        vs.accuracy_plot(self=vs, model_list=mlist)
+        self.save_model()

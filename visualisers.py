@@ -57,6 +57,7 @@ def fft_plot(data):
 def spectral_plot(data):
     """This shows a spectral plot of the data input into it."""
     f, t, sxx = signal.spectrogram(data, 2096)
+    # I may be able to get more information out of this is i select a good window, default is 'Tukey'
     plt.pcolormesh(t, f, sxx, shading='gouraud')
     plt.ylabel('Frequency [Hz]')
     plt.xlabel('Time [sec]')

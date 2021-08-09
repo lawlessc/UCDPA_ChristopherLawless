@@ -23,8 +23,8 @@ data = samples.import_flat_samples_add_targets(0, 50)
 # data can also be loaded in chunks and appended to the dataframe
 # data = data.append(samples.import_many_flat_samples_add_targets(20000, 20060))
 
-gs = Gr.GridSearcher()
-gs.do_search(data, describe=True)
+#gs = Gr.GridSearcher()
+#gs.do_search(data, describe=True)
 
 hypo_trainer = Hp.HyperParameterOpto()
 hypo_trainer.train_network(data)

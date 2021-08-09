@@ -5,7 +5,6 @@
 def get_path(id):
     """This takes a single string of the ID and outputs the path """
     first_three = id[0:3]
-    # print(first_three)
     file_path = first_three[0] + "/" + first_three[1] + "/" + first_three[2] + "/" + id + ".npy"
     # print(file_path)
     return file_path
