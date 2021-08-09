@@ -18,9 +18,15 @@ I have included the first 154 entries if a user wants to run it immediatly
 
 
 Necessary imports etc:
-Keras
-Kaggle
-Scikit-Learn
-MatPlot
+Sklearn (fft,scaling)
+Scipy.signal (Spectrograms)
+Keras (Neural Networks)
+TensorFlow (Backend for building and training Neural Networks)
+Matplotlib (visualizers)
+Matplotlib.pyplot  (visualizers)
+Kaggle  (Retrieving Competition Data)
 
+This project is also using Python Version 3.7 and CUDA
+
+The G2net dataset https://www.kaggle.com/c/g2net-gravitational-wave-detection/data
 

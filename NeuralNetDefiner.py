@@ -1,6 +1,5 @@
 import keras
-import pandas as pd
-from keras.layers import Dense, Flatten, Dropout, RNN, SimpleRNN, Reshape, Conv1D, Conv2D, MaxPooling1D,MaxPooling2D
+from keras.layers import Dense, Flatten, Dropout,Reshape, Conv1D, MaxPooling1D
 from keras.layers.advanced_activations import LeakyReLU, PReLU, ELU
 from keras.models import load_model, Sequential
 from keras.callbacks import EarlyStopping
@@ -12,7 +11,7 @@ import tensorflow as tf
 # Made by Christopher Lawless July 2021
 
 
-class Neural_Net_Definer:
+class NeuralNetDefiner:
     """This is a class for creating and saving various types of model, for Gridsearch use the create_model function"""
 
     def load_model(self, model_name):
@@ -200,8 +199,8 @@ class Neural_Net_Definer:
     #     print(data.target.values)
     #     print(predictors)
     #
-    #     mt = self.model.fit(predictors, data.target.values, epochs=1000,
-    #                         validation_split=0.10)  # , use_multiprocessing=True) This seems to be only for training large pools of models
+    # mt = self.model.fit(predictors, data.target.values, epochs=1000, validation_split=0.10)  # ,
+    # use_multiprocessing=True) This seems to be only for training large pools of models
     #
     #     # early_stopping_monitor= EarlyStopping(patience=2)
     #     # self.model.fit(predictors,target,validation_split = 0.3,nb_epoch=20

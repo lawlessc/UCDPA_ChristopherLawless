@@ -11,17 +11,17 @@ from keras.utils.np_utils import to_categorical
 from sklearn.decomposition import PCA
 from tensorflow.keras import mixed_precision
 
-import Neural_Net_Definer as nnd
+import NeuralNetDefiner as Nnd
 
 
-class grid_searcher:
-    '''This is a class for doing gird searches using GridSearchCV'''
+class GridSearcher:
+    """This is a class for doing gird searches using GridSearchCV"""
 
-    neuralnet_d = nnd.Neural_Net_Definer()
+    neuralnet_d = Nnd.NeuralNetDefiner()
 
     def do_search(self, data, describe=False):
-        '''This takes a  single dataframe as input and does a gridsearch , you can also set it to print information
-        on the dataframe '''
+        """This takes a  single dataframe as input and does a gridsearch , you can also set it to print information
+        on the dataframe """
         if describe == True:
             # print(data.describe())
             print(data.head())
@@ -73,7 +73,8 @@ class grid_searcher:
         print("Optimizer3:" + str(opto_ssg3))
 
     def do_ensemble_search(self, data):
-        '''This is incomplete but is to perform a grid search for training ensemble networks, it takes in a pandaframe of the training data'''
+        """This is incomplete but is to perform a grid search for training ensemble networks, it takes in a
+        pandaframe of the training data """
         predictors = data.drop(["target"], axis=1).to_numpy()
         model = KerasClassifier(build_fn=self.neuralnet_d.create_model, )
         param_grid = {"epochs": [1, 2, 3, 4, 5, 10, 11, 100],

@@ -56,25 +56,25 @@ def fft_plot(data):
 # https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.spectrogram.html
 def spectral_plot(data):
     """This shows a spectral plot of the data input into it."""
-    f, t, Sxx = signal.spectrogram(data, 2096)
-    plt.pcolormesh(t, f, Sxx, shading='gouraud')
+    f, t, sxx = signal.spectrogram(data, 2096)
+    plt.pcolormesh(t, f, sxx, shading='gouraud')
     plt.ylabel('Frequency [Hz]')
     plt.xlabel('Time [sec]')
     plt.show()
 
 
 def spectral_plot_multiple(data):
-    '''This shows a spectral plot of the data input into it.'''
+    """This shows a spectral plot of the data input into it."""
     for signals in data:
-        f, t, Sxx = signal.spectrogram(signals, 2096)
-        plt.pcolormesh(t, f, Sxx, shading='gouraud', alpha=0.6)
+        f, t, sxx = signal.spectrogram(signals, 2096)
+        plt.pcolormesh(t, f, sxx, shading='gouraud', alpha=0.6)
     plt.ylabel('Frequency [Hz]')
     plt.xlabel('Time [sec]')
     plt.show()
 
 
 def targets_bar_chart(data):
-    '''This shows a bar chart of the data input into it.'''
+    """This shows a bar chart of the data input into it."""
     counts = data['target'].value_counts()
     plt.ylabel("number of values")
     plt.bar(["0", "1"], height=counts, width=0.5, color=["b", "g"])

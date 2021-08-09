@@ -1,18 +1,20 @@
 from keras.optimizers import SGD, Adam
 import visualisers as vs
-import Neural_Net_Definer as nnd
+import NeuralNetDefiner as Nnd
 
 
-class hyper_parameter_opto:
+class HyperParameterOpto:
     """This is a class for doing hyper parameter optimization"""
 
     best_model = None
     best_accuracy = None
-    neuralnet_d = nnd.Neural_Net_Definer()
+    neuralnet_d = Nnd.NeuralNetDefiner()
 
     def train_network(self, data):
         """This is function takes in pandas dataframe and performs hyper parameter optimization, everytime a model
         beats the previous models on improvement it saves that model """
+
+        #trying out optimizers with different set learning rates.
         my_optimizer = SGD(learning_rate=0.0001, momentum=0.99, nesterov=True)
         my_optimizer2 = SGD(learning_rate=0.0000001, momentum=0.99, nesterov=True)
         # my_optimizer3 = SGD(learning_rate=0.000001, momentum=0.30, nesterov=False)
@@ -56,6 +58,7 @@ class hyper_parameter_opto:
 
         if self.best_model is None:
             self.best_model = model
+            self.best_accuracy = history.history["val_accuracy"]
 
         if self.best_accuracy is None:
             self.best_accuracy = history.history["val_accuracy"]
