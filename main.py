@@ -8,7 +8,7 @@ import GridSearcher as Gr
 
 print('Made by Christopher Lawless July 2021')
 
-# This is for downloading the ALL the files from the Kaggle competition dataset.
+# This is for downloading the ALL the files from the Kaggle competition dataset(72gb)
 # This requires you have installed the Kaggle Api and have an api key setup
 # kg.begin_download()
 
