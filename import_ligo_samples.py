@@ -5,36 +5,48 @@ import get_ligo_path as gp
 import import_targets as tg
 import visualisers as vs
 from sklearn import preprocessing
+from sklearn.preprocessing import MinMaxScaler
+from scipy.signal import spectrogram
+#import matplotlib as plt
+import matplotlib.pyplot as plt
 
 
 #just a test on a single file, shows 3 rows, 4096 columns
 #These rows correspond to the 3 detectors.
 def import_test():
-    '''This just imports one specific hardcoded file to confirm things are working'''
+    '''This just imports one specific hardcoded file and displays the three signals,to confirm things are working'''
     sample = np.load("data/train/0/0/0/00000e74ad.npy")
     print("import_test():")
     print(sample[0,0])
     print(type(sample))
     print(sample.shape)
     signal_list=[sample[0,:],sample[1,:],sample[2,:]]
-    vs.signal_plotter(self=vs,signals_list= signal_list)
+    vs.signal_plotter(signals_list= signal_list)
+    vs.fftPlot(sample[0,:])
+    vs.spectralplot_multiple(data=signal_list)
     return sample
 
-def import_single_sample(sample_name):
-    '''This imports a single sample as a data frame'''
+def import_single_sample_as_ndarray(sample_name):
+    '''This imports a single sample as a ndarray'''
+    detector_readings = np.load(gp.get_path_training(sample_name))
+    return detector_readings
+
+def import_single_sample_as_dataframe(sample_name):
+    '''This imports a single sample as a DataFrame'''
     detector_readings = np.load(gp.get_path_training(sample_name))
     df = pd.DataFrame(detector_readings)
+    return df
 
 def import_flat_training_sample(sample_name):
-    '''This imports a single sample from the training set (3 sensor readings) and returns it to the user as flat numpy array of lenght 12288
-    I have also attempted to do some preprocessing here'''
+    '''This imports a single sample from the training set (3 sensor readings) and returns it to the user as flat numpy array of lenght 12288'''
     #print("import_flat_training_sample")
     #samples names are hex numbers in the targets file
     #The first 3 also represent the path characters represent
-    detector_readings = np.load(gp.get_path_training(sample_name),allow_pickle=True,fix_imports=True).astype(np.float32)
+    detector_readings = np.load(gp.get_path_training(sample_name),allow_pickle=True,fix_imports=True).astype(np.float32)#Added these to make sure the data wasn't being loaded mangled somehow
     #detector_readings[2, :] = np.negative(detector_readings[2, :])#i inverted this signal as it's on the otherside of the world to the other detectors.
     #print(detector_readings)
     return detector_readings.flatten()
+
 
 def import_flat_testing_sample(sample_name):
     '''This imports a single sample as a numpy array from the competitions testing set'''

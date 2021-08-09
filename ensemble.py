@@ -1,4 +1,4 @@
-import NN_definer as nd
+import neural_net_definer as nd
 from keras.models import Sequential
 
 
@@ -7,7 +7,7 @@ class ensemble:
 
     model_list = []
     output_model = Sequential()#just a placeholder model
-    neuralnet_d = nd.NN_definer()
+    neuralnet_d = nd.neural_net_definer()
 
     def define_ensemble(self ,model_name_list,output_model_name):
         ''' This takes in a list of strings of the saved models, and the name of the output model'''

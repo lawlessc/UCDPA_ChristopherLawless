@@ -4,7 +4,7 @@ import kaggle_download as kg
 import exploratory_analysis as ex
 import hyper_parameter_opto as hp
 import grid_searcher as gr
-import NN_definer as nnd
+import neural_net_definer as nnd
 
 print(f'Made by Christopher Lawless July 2021')
 
@@ -12,30 +12,32 @@ print(f'Made by Christopher Lawless July 2021')
 #samples.import_list_of_flat_samples(testlist)
 
 ex.analysis_of_targets()
+ex.analysis_of_data()
+ex.analysis_of_signal()
 
-#neuralnet_d = nnd.NN_definer()
+#samples.import_test()
+#samples.
 
 
-
-samples.import_test()
 
 
 #For large amounts of data beyond 10,000 this can take a while to load
-data = samples.import_flat_samples_add_targets(0,500)
+data = samples.import_flat_samples_add_targets(0,5000)
+
 #data can also be loaded in chunks and appended to the dataframe
 #data = data.append(samples.import_many_flat_samples_add_targets(20000, 20060))
 
-print(data)
 
-gs = gr.grid_searcher()
-gs.do_search(data, describe=True)
+
+#gs = gr.grid_searcher()
+#gs.do_search(data, describe=True)
 
 
 #test_model = neuralnet_d.create_model()
 
 
-#trainer = hp.hyper_paramenter_training()
-#trainer.train_network(data)
+trainer = hp.hyper_parameter_opto()
+trainer.train_network(data)
 
 #Testing
 #df_test_data =samples.import_number_of_flat_testing_samples(4,100)
