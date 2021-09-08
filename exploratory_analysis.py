@@ -21,7 +21,7 @@ def analysis_of_signal():
     vs.fft_plot(sample[0, :])
     vs.spectral_plot(data=sample[0, :])
 
-    df = lg.import_flat_samples_add_targets(10, 20)
+    df = lg.import_flat_samples_add_targets(0, 10)
     df.shape
     df.columns
     df.head

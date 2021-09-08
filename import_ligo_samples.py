@@ -6,7 +6,7 @@ import import_targets as tg
 import visualisers as vs
 from sklearn import preprocessing
 from sklearn.preprocessing import MinMaxScaler
-
+import bandpass_filtering as bs
 
 
 # just a test on a single file, shows 3 rows, 4096 columns
@@ -18,6 +18,10 @@ def import_test():
     print(sample[0, 0])
     print(type(sample))
     print(sample.shape)
+
+
+
+
     signal_list = [sample[0, :], sample[1, :], sample[2, :]]
     vs.signal_plotter(signals_list=signal_list)
     vs.fftPlot(sample[0, :])
@@ -28,6 +32,10 @@ def import_test():
 def import_single_sample_as_ndarray(sample_name):
     """This imports a single sample as a ndarray"""
     detector_readings = np.load(gp.get_path_training(sample_name))
+    detector_readings[0, :] = bs.run(detector_readings[0, :])
+    detector_readings[1, :] = bs.run(detector_readings[1, :])
+    detector_readings[2, :] = bs.run(detector_readings[2, :])
+
     return detector_readings
 
 
@@ -48,6 +56,24 @@ def import_flat_training_sample(sample_name):
         np.float32)  # Added these to make sure the data wasn't being loaded mangled somehow
     # detector_readings[2, :] = np.negative(detector_readings[2, :])#i inverted this signal as it's on the otherside of the world to the other detectors.
     # print(detector_readings)
+    #print("mean")
+    #print(np.mean(detector_readings))
+
+    #print("std")
+    #print(np.std(detector_readings))
+
+    #detector_readings = bs.run(detector_readings)
+    #detector_readings[0, :] = bs.run(detector_readings[0, :])
+    #detector_readings[1, :] = bs.run(detector_readings[1, :])
+    #detector_readings[2, :] = bs.run(detector_readings[2, :])
+
+
+    # signal_list = [detector_readings[0, :], detector_readings[1, :], detector_readings[2, :]]
+    # vs.signal_plotter(signals_list=signal_list)
+    # vs.fft_plot(detector_readings[0, :])
+    # vs.spectral_plot(data=detector_readings[0, :])
+
+
     return detector_readings.flatten()
 
 
@@ -61,15 +87,13 @@ def import_flat_testing_sample(sample_name):
 def import_list_of_flat_training_samples(sample_name_list):
     """This takes flat samples as an array of ID's from the training set"""
     numpy_arrays_list = []
-    df = pd.DataFrame()
+    #df = pd.DataFrame()
     for sample in sample_name_list:
-        numpy_arrays_list.append(import_flat_training_sample(sample))
-    # this appends all the rows of numpy arrays list to the dataframe
 
-    # print(numpy_arrays_list)
-    df = df.append(pd.DataFrame(numpy_arrays_list))
-    # print(df)
-    # df.append(pd.DataFrame(numpy_arrays_list))
+        numpy_arrays_list.append(import_flat_training_sample(sample))
+
+    df = pd.DataFrame(numpy_arrays_list)
+
     return df
 
 
@@ -89,7 +113,7 @@ def import_number_of_flat_testing_samples(starting_number, ending_number):
     targets_df = tg.import_testing_targets()
     sample_name_list = []
     # get the list of sample names for the range
-    for entry in range(starting_number, ending_number + 1):
+    for entry in range(starting_number, ending_number):
         sample_name_list.append(targets_df["id"].values[entry])
     return import_list_of_flat_testing_samples(sample_name_list)
 
@@ -101,13 +125,47 @@ def import_flat_samples_add_targets(starting_number, ending_number):
     sample_name_list = []
     target_list = []
 
-    for entry in range(starting_number, ending_number + 1):
+    for entry in range(starting_number, ending_number):
         sample_name_list.append(targets_df["id"].values[entry])
         target_list.append(float(targets_df["target"].values[entry]))
 
     samples_df = import_list_of_flat_training_samples(sample_name_list)
     samples_df["target"] = target_list
     samples_df["id"] = sample_name_list
+    print(samples_df)
+    return samples_df
+
+def import_positive_flat_samples_add_targets(starting_number, ending_number):
+    """This takes takes integers,0 to N and imports them from the training set as panda, it also adds the targets and
+    ID's to them """
+    targets_df = tg.import_positive_training_targets()
+    sample_name_list = []
+    target_list = []
+
+    for entry in range(starting_number, ending_number):
+        sample_name_list.append(targets_df["id"].values[entry])
+        target_list.append(float(targets_df["target"].values[entry]))
+
+    samples_df = import_list_of_flat_training_samples(sample_name_list)
+    #samples_df["target"] = target_list
+    #samples_df["id"] = sample_name_list
+    print(samples_df)
+    return samples_df
+
+def import_negative_flat_samples_add_targets(starting_number, ending_number):
+    """This takes takes integers,0 to N and imports them from the training set as panda, it also adds the targets and
+    ID's to them """
+    targets_df = tg.import_negative_training_targets()
+    sample_name_list = []
+    target_list = []
+
+    for entry in range(starting_number, ending_number):
+        sample_name_list.append(targets_df["id"].values[entry])
+        target_list.append(float(targets_df["target"].values[entry]))
+
+    samples_df = import_list_of_flat_training_samples(sample_name_list)
+    #samples_df["target"] = target_list
+    #samples_df["id"] = sample_name_list
     print(samples_df)
     return samples_df
 
