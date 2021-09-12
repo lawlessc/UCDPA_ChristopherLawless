@@ -59,6 +59,9 @@ def import_flat_training_sample(sample_name):
     #print("mean")
     #print(np.mean(detector_readings))
 
+    detector_readings[0]= np.linalg.norm(detector_readings[0])
+    detector_readings[1] = np.linalg.norm(detector_readings[1])
+    detector_readings[2] = np.linalg.norm(detector_readings[2])
     #print("std")
     #print(np.std(detector_readings))
 

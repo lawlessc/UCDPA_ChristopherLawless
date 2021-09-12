@@ -1,13 +1,14 @@
 import keras
 import pandas as pd
 from keras.utils.np_utils import to_categorical
-from keras.layers import Dense, Flatten, Dropout,Reshape, Conv1D, MaxPooling1D,Rescaling
+from keras.layers import Dense, Flatten, Dropout,Reshape, Conv1D, MaxPooling1D,Rescaling, Conv2D ,AveragePooling1D
 from keras.layers.advanced_activations import LeakyReLU, PReLU, ELU
-from keras.models import load_model, Sequential
+from keras.models import load_model, Sequential, Layer
 from keras.callbacks import EarlyStopping
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from datetime import datetime
 import tensorflow as tf
+from tensorflow.keras import layers
 import visualisers as vs
 
 
@@ -27,27 +28,58 @@ class NeuralNetDefiner:
         """function tales in the first layer width, dropout, decay, number or hidden layers and their width and the
         optimizer and initial weights this is mainly for use with GridSearchCV but can be used discretely if you just
         want a model """
-        model = Sequential()
-
+        #model = Sequential()
         # Input Layer
-        model.add(Reshape((4096, 3), input_shape=(12288,)))
+        #model.add(Reshape((4096, 3), input_shape=(12288,)))
 
-        model.add(Dense(100, activation='relu', kernel_initializer='he_uniform',input_shape=(4096,3)))
+        inputs = keras.Input(shape=(12288,1))
 
-        model.add(Conv1D(first_layer, kernel_size=(3), activation='relu', input_shape=(4096, 3),
-                         kernel_initializer="he_uniform"))
-        model.add(LeakyReLU(alpha=0.3))
+       # reshaped = layers.Reshape((4096, 3), input_shape=(12288,))(inputs)
+        #reshaped=keras.Input(shape=(12288,))
+
+        #densex = layers.Dense(10, activation="relu")
+        densex = Conv1D(16, 100, padding='same', activation='relu')(inputs)
+        x = AveragePooling1D(32, strides=20, padding='same')(densex)
+        densex2 = Conv1D(16, 100, padding='same', activation='relu')(x)
+        x2 = AveragePooling1D(32, strides=20, padding='same')(densex2)
 
 
-        model.add(LeakyReLU(alpha=0.3))
+        densey = Conv1D(16, 10, padding='same', activation='relu')(inputs)
+        y = AveragePooling1D(32, strides=2, padding='same')(densey)
+        densey2 = Conv1D(16, 10, padding='same', activation='relu')(y)
+        y2 = AveragePooling1D(32, strides=2, padding='same')(densey2)
 
-        model.add(LeakyReLU(alpha=0.3))
+        densez = Conv1D(16, 2048, padding='same', activation='relu')(inputs)
+        z = AveragePooling1D(32, strides=2048, padding='same')(densez)
+        densez2 = Conv1D(16, 2048, padding='same', activation='relu')(z)
+        z2 = AveragePooling1D(32, strides=2048, padding='same')(densez2)
 
+        lazer = LeakyReLU(alpha=0.5)(inputs)
+        denzer = Dense(16, activation="relu")(lazer)
 
+        merged = keras.layers.concatenate([x2, y2, z2,denzer], axis=1)
+        lazy =   LeakyReLU(alpha=0.3)(merged)
+        lazy2 = LeakyReLU(alpha=0.3)(lazy)
+        dens = Dense(10, activation="relu")(lazy2)
+        lazy3 = LeakyReLU(alpha=0.3)(dens)
+        dens2 = Dense(5, activation="relu")(lazy3)
 
+        #merged = Flatten()(merged)
+
+        outputs = layers.Dense(1,activation="sigmoid")(dens2)
+        #outputs = outputs(outputs)
+
+        model = keras.Model(inputs=inputs, outputs=outputs)
+
+        # model.add(Dense(100, activation='relu', kernel_initializer='he_uniform',input_shape=(4096,3)))
+        # model.add(Conv1D(first_layer, kernel_size=(3), activation='relu', input_shape=(4096, 3),
+        #                  kernel_initializer="he_uniform"))
+        # model.add(LeakyReLU(alpha=0.3))
+        # model.add(LeakyReLU(alpha=0.3))
+        # model.add(LeakyReLU(alpha=0.3))
+        # #model.add(Dense(1, activation="sigmoid"))
+        # model.add(LeakyReLU(0.001))
         #model.add(Dense(1, activation="sigmoid"))
-        model.add(LeakyReLU(0.001))
-        model.add(Dense(1, activation="sigmoid"))
 
         # Compile
         model.compile(optimizer=optimizer, loss=lossf, metrics=["accuracy"])

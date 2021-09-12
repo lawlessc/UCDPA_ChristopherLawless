@@ -80,12 +80,12 @@ class GridSearcher:
                                                             shuffle=False)  # test sets are empty
         # because i am testing with cross validation in gridsearch
 
-        # predictor_scaler = MinMaxScaler().fit(X_train)
-        # X_train = predictor_scaler.transform(X_train)
-
-        predictor_scaler = StandardScaler().fit(X_train)
-        # StandardScaler.set_params(with_mean=False)
+        predictor_scaler = MinMaxScaler().fit(X_train)
         X_train = predictor_scaler.transform(X_train)
+
+        #predictor_scaler = StandardScaler().fit(X_train)
+        # StandardScaler.set_params(with_mean=False)
+        #X_train = predictor_scaler.transform(X_train)
 
         results = grid.fit(X_train, y_train)
         # results.
