@@ -1,7 +1,7 @@
 import keras
 import pandas as pd
 from keras.utils.np_utils import to_categorical
-from keras.layers import Dense, Flatten, Dropout,Reshape, Conv1D, MaxPooling1D,Rescaling, Conv2D ,AveragePooling1D
+from keras.layers import Dense, Flatten, Dropout, Reshape, Conv1D, MaxPooling1D, Rescaling, Conv2D, AveragePooling1D
 from keras.layers.advanced_activations import LeakyReLU, PReLU, ELU
 from keras.models import load_model, Sequential, Layer
 from keras.callbacks import EarlyStopping
@@ -24,69 +24,52 @@ class NeuralNetDefiner:
 
     def create_model(self, first_layer=30, hidden_layers=1, max_pool_size=10, layer_widths=10, optimizer="sgd",
                      winit="glorot_uniform", cnn_window_size=30, dropout=0.01, decay=0.01, input_shape=(12288,),
-                     lossf='mean_squared_error' ):
+                     lossf='mean_squared_error'):
         """function tales in the first layer width, dropout, decay, number or hidden layers and their width and the
         optimizer and initial weights this is mainly for use with GridSearchCV but can be used discretely if you just
         want a model """
-        #model = Sequential()
-        # Input Layer
-        #model.add(Reshape((4096, 3), input_shape=(12288,)))
+        # model.add(Reshape((4096, 3), input_shape=(12288,)))
 
-        inputs = keras.Input(shape=(12288,1))
+        inputs = keras.Input(shape=(12288, 1))
 
-       # reshaped = layers.Reshape((4096, 3), input_shape=(12288,))(inputs)
-        #reshaped=keras.Input(shape=(12288,))
-
-        #densex = layers.Dense(10, activation="relu")
-        densex = Conv1D(16, 100, padding='same', activation='relu')(inputs)
-        x = AveragePooling1D(32, strides=20, padding='same')(densex)
-        densex2 = Conv1D(16, 100, padding='same', activation='relu')(x)
-        x2 = AveragePooling1D(32, strides=20, padding='same')(densex2)
+        a = Conv1D(32, 4096, padding='same', activation='relu')(inputs)
+        a = MaxPooling1D(12, padding='same')(a)
+        a = LeakyReLU(alpha=0.3)(a)
+        a = Conv1D(64, 256, padding='same', activation='relu')(a)
+        a = MaxPooling1D(12, padding='same')(a)
+        a = Dense(25, activation="relu", kernel_initializer="he_uniform")(a)
 
 
-        densey = Conv1D(16, 10, padding='same', activation='relu')(inputs)
-        y = AveragePooling1D(32, strides=2, padding='same')(densey)
-        densey2 = Conv1D(16, 10, padding='same', activation='relu')(y)
-        y2 = AveragePooling1D(32, strides=2, padding='same')(densey2)
+        b = Conv1D(32, 4096, padding='same', activation='relu')(inputs)
+        b = AveragePooling1D(12, padding='same')(b)
+        b = LeakyReLU(alpha=0.3)(b)
+        b = Conv1D(64, 256, padding='same', activation='relu')(b)
+        b = AveragePooling1D(12, padding='same')(b)
+        b = Dense(25, activation="relu", kernel_initializer="he_uniform")(b)
 
-        densez = Conv1D(16, 2048, padding='same', activation='relu')(inputs)
-        z = AveragePooling1D(32, strides=2048, padding='same')(densez)
-        densez2 = Conv1D(16, 2048, padding='same', activation='relu')(z)
-        z2 = AveragePooling1D(32, strides=2048, padding='same')(densez2)
 
-        lazer = LeakyReLU(alpha=0.5)(inputs)
-        denzer = Dense(16, activation="relu")(lazer)
+        # c = Dense(25, activation="relu", kernel_initializer="he_uniform")(inputs)
 
-        merged = keras.layers.concatenate([x2, y2, z2,denzer], axis=1)
-        lazy =   LeakyReLU(alpha=0.3)(merged)
-        lazy2 = LeakyReLU(alpha=0.3)(lazy)
-        dens = Dense(10, activation="relu")(lazy2)
-        lazy3 = LeakyReLU(alpha=0.3)(dens)
-        dens2 = Dense(5, activation="relu")(lazy3)
+        d = keras.layers.concatenate([a, b], axis=1)
 
-        #merged = Flatten()(merged)
+        d = Conv1D(32, 400, padding='same', activation='relu')(d)
+        d = AveragePooling1D(12, padding='same')(d)
+        d = LeakyReLU(alpha=0.3)(d)
 
-        outputs = layers.Dense(1,activation="sigmoid")(dens2)
-        #outputs = outputs(outputs)
+        # d =  keras.layers.Dropout(0.3)(d)
+        d = Dense(10, activation="relu", kernel_initializer="he_uniform")(d)
+        d = LeakyReLU(alpha=0.3)(d)
+
+        outputs = layers.Dense(1, activation="sigmoid", kernel_initializer="he_uniform")(d)
 
         model = keras.Model(inputs=inputs, outputs=outputs)
-
-        # model.add(Dense(100, activation='relu', kernel_initializer='he_uniform',input_shape=(4096,3)))
-        # model.add(Conv1D(first_layer, kernel_size=(3), activation='relu', input_shape=(4096, 3),
-        #                  kernel_initializer="he_uniform"))
-        # model.add(LeakyReLU(alpha=0.3))
-        # model.add(LeakyReLU(alpha=0.3))
-        # model.add(LeakyReLU(alpha=0.3))
-        # #model.add(Dense(1, activation="sigmoid"))
-        # model.add(LeakyReLU(0.001))
-        #model.add(Dense(1, activation="sigmoid"))
 
         # Compile
         model.compile(optimizer=optimizer, loss=lossf, metrics=["accuracy"])
         return model
 
     def create_autoencoder(self, first_layer=30, hidden_layers=1, max_pool_size=10, layer_widths=10, optimizer="adam",
-                     winit="random_uniform", cnn_window_size=30, dropout=0.01, decay=0.01, input_shape=(12288,),
+                           winit="random_uniform", cnn_window_size=30, dropout=0.01, decay=0.01, input_shape=(12288,),
                            lossf='mean_squared_error'
                            ):
         """function tales in the first layer width, dropout, decay, number or hidden layers and their width and the
@@ -94,29 +77,23 @@ class NeuralNetDefiner:
         want a model """
         model = Sequential()
 
+        # model.add(Reshape((4096, 3), input_shape=(12288,)))
+        model.add(Dense(55, activation="sigmoid", kernel_initializer=winit, input_shape=(55,)))
+        #  model.add(LeakyReLU(55, input_shape=(55,)))
+        # model.add(Dropout(dropout))
 
-       #model.add(Reshape((4096, 3), input_shape=(12288,)))
-        model.add(Dense(55, activation="sigmoid", kernel_initializer=winit,input_shape=(55,)))
-      #  model.add(LeakyReLU(55, input_shape=(55,)))
-        #model.add(Dropout(dropout))
-
-
-       # model.add(Dense(40, activation="sigmoid", kernel_initializer=winit))
+        # model.add(Dense(40, activation="sigmoid", kernel_initializer=winit))
         for x in range(hidden_layers):
             model.add(LeakyReLU(alpha=0.3))
-        #model.add(LeakyReLU(layer_widths))
-        #model.add(Dense(layer_widths, activation="tanh", kernel_initializer=winit))
-        #model.add(LeakyReLU(55))
+        # model.add(LeakyReLU(layer_widths))
+        # model.add(Dense(layer_widths, activation="tanh", kernel_initializer=winit))
+        # model.add(LeakyReLU(55))
 
-
-        model.add(Dense(55, activation="sigmoid",kernel_initializer=winit))
+        model.add(Dense(55, activation="sigmoid", kernel_initializer=winit))
 
         # Compile
-        model.compile(optimizer=optimizer, loss=lossf ,metrics=["accuracy"])
+        model.compile(optimizer=optimizer, loss=lossf, metrics=["accuracy"])
         return model
-
-
-
 
     def create_ensemble_model(self, first_layer, dropout, decay, hidden_layers, layer_widths, optimizer, winit):
         """This is not in use but was intended to be for training a model, that learns the outputs of other models"""
@@ -156,32 +133,27 @@ class NeuralNetDefiner:
         model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=["accuracy"])
         return model
 
-
-
-
-    def fit_model_auto_encoder(self, data, epochs, model, batch_size,use_early_stopping_time=0):
+    def fit_model_auto_encoder(self, data, epochs, model, batch_size, use_early_stopping_time=0):
         """Takes in data, epochs, a keras model and batch_size, and if early stopping is to be used."""
         print("fit model")
 
         predictors = data
 
-        predictor_scaler = MinMaxScaler(feature_range=(0,1)).fit(predictors)
+        predictor_scaler = MinMaxScaler(feature_range=(0, 1)).fit(predictors)
         predictors = predictor_scaler.transform(predictors)
 
-        #predictor_scaler = StandardScaler().fit(predictors)
-        #predictors = predictor_scaler.transform(predictors)
+        # predictor_scaler = StandardScaler().fit(predictors)
+        # predictors = predictor_scaler.transform(predictors)
 
-
-       # print(data.target.values)
+        # print(data.target.values)
         print(predictors[1])
 
-        #I create a callback list for potential callbacks i might want.
-        callbacks =[]
+        # I create a callback list for potential callbacks i might want.
+        callbacks = []
 
-        #This inserts a an early stopping monitor into callbacks with a set time.
+        # This inserts a an early stopping monitor into callbacks with a set time.
         if use_early_stopping_time > 0:
             callbacks = [EarlyStopping(patience=use_early_stopping_time, monitor="val_accuracy")]
-
 
         mt = model.fit(predictors, predictors, epochs=epochs, batch_size=batch_size,
                        validation_split=0.15, callbacks=callbacks)  #
@@ -189,12 +161,7 @@ class NeuralNetDefiner:
         mlist = [mt]
         return mt, model
 
-
-
-
-
-
-    def fit_model(self, data, epochs, model, batch_size,use_early_stopping_time=0):
+    def fit_model(self, data, epochs, model, batch_size, use_early_stopping_time=0):
         """Takes in data, epochs, a keras model and batch_size, and if early stopping is to be used."""
         print("fit model")
         predictors = data.drop(["id"], axis=1)
@@ -207,13 +174,12 @@ class NeuralNetDefiner:
         print(data.target.values)
         print(predictors[1])
 
-        #I create a callback list for potential callbacks i might want.
-        callbacks =[]
+        # I create a callback list for potential callbacks i might want.
+        callbacks = []
 
-        #This inserts a an early stopping monitor into callbacks with a set time.
+        # This inserts a an early stopping monitor into callbacks with a set time.
         if use_early_stopping_time > 0:
             callbacks = [EarlyStopping(patience=use_early_stopping_time, monitor="val_accuracy")]
-
 
         mt = model.fit(predictors, data.target.to_numpy(), epochs=epochs, batch_size=batch_size,
                        validation_split=0.25, callbacks=callbacks)  #
@@ -241,22 +207,22 @@ class NeuralNetDefiner:
         print("Loss: " + self.model.loss)
         model.summary()
 
-    def make_single_prediction_with(self,model_name,data_to_predict_with):
+    def make_single_prediction_with(self, model_name, data_to_predict_with):
         loaded_model = load_model(model_name)
         predictions = pd.DataFrame()
-        probability_true =[]
+        probability_true = []
 
-        for index ,row in data_to_predict_with.iterrows():
-            #print(row)
+        for index, row in data_to_predict_with.iterrows():
+            # print(row)
             predictions = loaded_model.predict((pd.DataFrame(row).T).values)
             print(pd.DataFrame(row).T)
-            probability_true.append(predictions[:,1])
+            probability_true.append(predictions[:, 1])
 
         for prediction in probability_true:
             print(prediction)
 
     def make_single_prediction_with_model(self, model, data_to_predict_with):
-       # loaded_model = load_model(model_name)
+        # loaded_model = load_model(model_name)
         predictions = pd.DataFrame()
         probability_true = []
 
@@ -268,10 +234,7 @@ class NeuralNetDefiner:
         for prediction in probability_true:
             print(prediction)
 
-
-
-
-    def retrain_model(self,model_name,data):
+    def retrain_model(self, model_name, data):
         loaded_model = load_model(model_name)
 
         predictors = data.drop(["target"], axis=1).values  # .as_matrix()
@@ -280,7 +243,8 @@ class NeuralNetDefiner:
         print(data.target.values)
         print(predictors)
 
-        mt = self.model.fit(predictors, data.target.values, epochs=1000, validation_split=0.10)  # ,use_multiprocessing=True) This seems to be only for training large pools of models
+        mt = self.model.fit(predictors, data.target.values, epochs=1000,
+                            validation_split=0.10)  # ,use_multiprocessing=True) This seems to be only for training large pools of models
 
         # early_stopping_monitor= EarlyStopping(patience=2)
         # self.model.fit(predictors,target,validation_split = 0.3,nb_epoch=20

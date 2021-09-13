@@ -24,7 +24,7 @@ print('Made by Christopher Lawless July 2021')
 
 # For large amounts of data beyond 10,000 this can take a while to load
 # If you haven't downloaded the data via Kaggle you will only have 154 samples to use starting at 0
-data = samples.import_flat_samples_add_targets(0, 5192)
+data = samples.import_flat_samples_add_targets(0, 10192)
 
 #data_pos = samples.import_positive_flat_samples_add_targets(0,5192)
 

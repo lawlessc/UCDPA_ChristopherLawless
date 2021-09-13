@@ -51,7 +51,7 @@ class GridSearcher:
 
         early_stopping = EarlyStopping(monitor='loss', patience=3)
 
-        param_grid = {"epochs": [300],
+        param_grid = {"epochs": [13],
                       "first_layer": [10],
                       "hidden_layers": [4],
                       "layer_widths": [12],
@@ -59,10 +59,10 @@ class GridSearcher:
                       "max_pool_size": [10],
                       "optimizer": [opto_ssg3],
                       "winit": ["random_uniform"],
-                      "batch_size": [512],
+                      "batch_size": [150],
                       "dropout": [0.70],
                       "decay": [0.01],
-                      "lossf": ["mean_squared_error"]
+                      "lossf": ["binary_crossentropy"]
                      # "callbacks": [early_stopping]
                       }
 
