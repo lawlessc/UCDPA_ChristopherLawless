@@ -1,14 +1,14 @@
+from datetime import datetime
+
 import keras
 import pandas as pd
-from keras.utils.np_utils import to_categorical
-from keras.layers import Dense, Flatten, Dropout, Reshape, Conv1D, MaxPooling1D, Rescaling, Conv2D, AveragePooling1D
-from keras.layers.advanced_activations import LeakyReLU, PReLU, ELU
-from keras.models import load_model, Sequential, Layer
 from keras.callbacks import EarlyStopping
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
-from datetime import datetime
-import tensorflow as tf
-from tensorflow.keras import layers
+from keras.layers import Dense, Flatten, Conv1D, MaxPooling1D, AveragePooling1D,GlobalAveragePooling1D,GlobalMaxPooling1D
+from keras.layers import Input
+from keras.layers.advanced_activations import LeakyReLU
+from keras.models import load_model, Sequential
+from keras.utils.np_utils import to_categorical
+from sklearn.preprocessing import MinMaxScaler
 import visualisers as vs
 
 
@@ -24,48 +24,56 @@ class NeuralNetDefiner:
 
     def create_model(self, first_layer=30, hidden_layers=1, max_pool_size=10, layer_widths=10, optimizer="sgd",
                      winit="glorot_uniform", cnn_window_size=30, dropout=0.01, decay=0.01, input_shape=(12288,),
-                     lossf='mean_squared_error'):
+                     lossf='binary_crossentropy'):
         """function tales in the first layer width, dropout, decay, number or hidden layers and their width and the
         optimizer and initial weights this is mainly for use with GridSearchCV but can be used discretely if you just
         want a model """
         # model.add(Reshape((4096, 3), input_shape=(12288,)))
 
-        inputs = keras.Input(shape=(12288, 1))
+        inputs = Input(shape=(12288,1))
 
-        a = Conv1D(32, 4096, padding='same', activation='relu')(inputs)
-        a = MaxPooling1D(12, padding='same')(a)
-        a = LeakyReLU(alpha=0.3)(a)
-        a = Conv1D(64, 256, padding='same', activation='relu')(a)
-        a = MaxPooling1D(12, padding='same')(a)
+
+        a = Conv1D(64, 3, padding='same')(inputs)
+        a = MaxPooling1D(120, padding='same')(a)
+        a = LeakyReLU(alpha=0.01)(a)
+        a = Conv1D(64, 6, padding='same')(a)
+        a = MaxPooling1D(10, padding='same')(a)
+        a = LeakyReLU(alpha=0.01)(a)
         a = Dense(25, activation="relu", kernel_initializer="he_uniform")(a)
 
 
-        b = Conv1D(32, 4096, padding='same', activation='relu')(inputs)
-        b = AveragePooling1D(12, padding='same')(b)
-        b = LeakyReLU(alpha=0.3)(b)
-        b = Conv1D(64, 256, padding='same', activation='relu')(b)
-        b = AveragePooling1D(12, padding='same')(b)
+        b = Conv1D(64, 3, padding='same')(inputs)
+        b = AveragePooling1D(120, padding='same')(b)
+        b = LeakyReLU(alpha=0.01)(b)
+        b = Conv1D(64, 6, padding='same')(b)
+        b = AveragePooling1D(10,padding='same')(b)
+        b = LeakyReLU(alpha=0.01)(b)
         b = Dense(25, activation="relu", kernel_initializer="he_uniform")(b)
 
 
-        # c = Dense(25, activation="relu", kernel_initializer="he_uniform")(inputs)
 
         d = keras.layers.concatenate([a, b], axis=1)
-
-        d = Conv1D(32, 400, padding='same', activation='relu')(d)
-        d = AveragePooling1D(12, padding='same')(d)
         d = LeakyReLU(alpha=0.3)(d)
-
-        # d =  keras.layers.Dropout(0.3)(d)
-        d = Dense(10, activation="relu", kernel_initializer="he_uniform")(d)
+        d = Dense(25, activation="relu", kernel_initializer="he_uniform")(d)
         d = LeakyReLU(alpha=0.3)(d)
+        d = Dense(19, activation="relu", kernel_initializer="he_uniform")(d)
+        d = LeakyReLU(alpha=0.3)(d)
+        d = Dense(6, activation="relu", kernel_initializer="he_uniform")(d)
+        d = LeakyReLU(alpha=0.3)(d)
+        d = Dense(6, activation="relu", kernel_initializer="he_uniform")(d)
+        d = LeakyReLU(alpha=0.3)(d)
+        d = Dense(6 , activation="relu", kernel_initializer="he_uniform")(d)
+        d = LeakyReLU(alpha=0.3)(d)
+        #d = Dense(5, activation="relu", kernel_initializer="he_uniform")(d)
+        d = Flatten()(d)
+        outputs = Dense(1, activation="sigmoid", kernel_initializer="he_uniform")(d)
 
-        outputs = layers.Dense(1, activation="sigmoid", kernel_initializer="he_uniform")(d)
+
+
 
         model = keras.Model(inputs=inputs, outputs=outputs)
-
-        # Compile
         model.compile(optimizer=optimizer, loss=lossf, metrics=["accuracy"])
+        model.summary()
         return model
 
     def create_autoencoder(self, first_layer=30, hidden_layers=1, max_pool_size=10, layer_widths=10, optimizer="adam",
@@ -92,7 +100,7 @@ class NeuralNetDefiner:
         model.add(Dense(55, activation="sigmoid", kernel_initializer=winit))
 
         # Compile
-        model.compile(optimizer=optimizer, loss=lossf, metrics=["accuracy"])
+        model.compile(optimizer=optimizer, loss=lossf, metrics=["accuracy"], experimental_steps_per_execution=False)
         return model
 
     def create_ensemble_model(self, first_layer, dropout, decay, hidden_layers, layer_widths, optimizer, winit):
@@ -168,11 +176,16 @@ class NeuralNetDefiner:
         predictors = predictors.drop(["target"], axis=1).to_numpy()  # .as_matrix()
         # targets = to_categorical(data.target)
 
-        predictor_scaler = StandardScaler().fit(predictors)
+        # predictor_scaler = StandardScaler().fit(predictors)
+        # predictors = predictor_scaler.transform(predictors)
+
+        predictor_scaler = MinMaxScaler().fit(predictors)
         predictors = predictor_scaler.transform(predictors)
 
         print(data.target.values)
         print(predictors[1])
+        # print(predictors.to_numpy())
+        print(predictors)
 
         # I create a callback list for potential callbacks i might want.
         callbacks = []
@@ -181,7 +194,7 @@ class NeuralNetDefiner:
         if use_early_stopping_time > 0:
             callbacks = [EarlyStopping(patience=use_early_stopping_time, monitor="val_accuracy")]
 
-        mt = model.fit(predictors, data.target.to_numpy(), epochs=epochs, batch_size=batch_size,
+        mt = model.fit(predictors, data.target, epochs=epochs, batch_size=batch_size,
                        validation_split=0.25, callbacks=callbacks)  #
 
         mlist = [mt]

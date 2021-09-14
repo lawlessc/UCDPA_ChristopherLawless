@@ -24,7 +24,7 @@ print('Made by Christopher Lawless July 2021')
 
 # For large amounts of data beyond 10,000 this can take a while to load
 # If you haven't downloaded the data via Kaggle you will only have 154 samples to use starting at 0
-data = samples.import_flat_samples_add_targets(0, 10192)
+data = samples.import_flat_samples_add_targets(0, 9200)
 
 #data_pos = samples.import_positive_flat_samples_add_targets(0,5192)
 
@@ -43,8 +43,8 @@ data = samples.import_flat_samples_add_targets(0, 10192)
 #ec.try_entropy(data)
 
 # This does gridsearch
-gs = Gr.GridSearcher()
-gs.do_search(data, describe=True)
+#gs = Gr.GridSearcher()
+#gs.do_search(data, describe=True)
 
 #pcapos = pca.do_pca_of_data(data=data_pos)
 
@@ -55,7 +55,8 @@ gs.do_search(data, describe=True)
 
 #gs.do_auto_encoder_search(data_neg,describe=True)
 # This does my own attempt at building a hyperameter tuning.
-#hypo_trainer = Hp.HyperParameterOpto()
+hypo_trainer = Hp.HyperParameterOpto()
+hypo_trainer.train_network(data)
 #hypo_trainer.train_auto_encoder_network(pcapos)
 
 # This does PCA
