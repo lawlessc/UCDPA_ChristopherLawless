@@ -2,14 +2,18 @@ from datetime import datetime
 
 import keras
 import pandas as pd
+import numpy as np
+import tensorflow
 from keras.callbacks import EarlyStopping
-from keras.layers import Dense, Flatten, Conv1D, MaxPooling1D, AveragePooling1D,GlobalAveragePooling1D,GlobalMaxPooling1D
-from keras.layers import Input
+from keras.layers import Dense, Flatten, Conv1D, MaxPooling1D, AveragePooling1D,GlobalAveragePooling1D,GlobalMaxPooling1D, ELU, Attention ,SimpleRNN,GRU
+from keras.layers import Input, Dropout ,Reshape, Conv2D ,MaxPooling2D ,AveragePooling2D ,BatchNormalization,GaussianDropout,GaussianNoise , UpSampling1D, ConvLSTM2D
 from keras.layers.advanced_activations import LeakyReLU
 from keras.models import load_model, Sequential
 from keras.utils.np_utils import to_categorical
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 import visualisers as vs
+from keras import regularizers
+from keras.constraints import unit_norm
 
 
 # Made by Christopher Lawless July 2021
@@ -24,55 +28,114 @@ class NeuralNetDefiner:
 
     def create_model(self, first_layer=30, hidden_layers=1, max_pool_size=10, layer_widths=10, optimizer="sgd",
                      winit="glorot_uniform", cnn_window_size=30, dropout=0.01, decay=0.01, input_shape=(12288,),
-                     lossf='binary_crossentropy'):
+                     lossf='binary_crossentropy' ,seed_num=45):
         """function tales in the first layer width, dropout, decay, number or hidden layers and their width and the
         optimizer and initial weights this is mainly for use with GridSearchCV but can be used discretely if you just
         want a model """
         # model.add(Reshape((4096, 3), input_shape=(12288,)))
 
-        inputs = Input(shape=(12288,1))
+        tensorflow.random.set_seed(seed_num)
 
 
-        a = Conv1D(64, 3, padding='same')(inputs)
-        a = MaxPooling1D(120, padding='same')(a)
-        a = LeakyReLU(alpha=0.01)(a)
-        a = Conv1D(64, 6, padding='same')(a)
-        a = MaxPooling1D(10, padding='same')(a)
-        a = LeakyReLU(alpha=0.01)(a)
-        a = Dense(25, activation="relu", kernel_initializer="he_uniform")(a)
+        inputs = Input(shape=(4096,3,1))
+
+        a = Conv2D(2, (1, 1), padding='same',activation="linear", kernel_initializer=winit,kernel_constraint=unit_norm(),
+                   kernel_regularizer="l1")(inputs)
+        a = Conv2D(2, (2, 1), padding='same', activation="linear", kernel_initializer=winit,
+                   kernel_constraint=unit_norm(),
+                   kernel_regularizer="l1")(a)
+        a = Conv2D(9, (3, 1), padding='same', activation="relu", kernel_initializer=winit,
+                   kernel_constraint=unit_norm(),
+                   kernel_regularizer="l1")(a)
+        a = Dropout(0.25)(a)
+        a = BatchNormalization()(a)
+        a = ELU()(a)
+        # a = SimpleRNN(4)(a)
+        a = Dense(2, activation="relu", kernel_initializer=winit, kernel_constraint=unit_norm())(a)
+        a = Flatten()(a)
+        # a = Attention()(a)
 
 
-        b = Conv1D(64, 3, padding='same')(inputs)
-        b = AveragePooling1D(120, padding='same')(b)
-        b = LeakyReLU(alpha=0.01)(b)
-        b = Conv1D(64, 6, padding='same')(b)
-        b = AveragePooling1D(10,padding='same')(b)
-        b = LeakyReLU(alpha=0.01)(b)
-        b = Dense(25, activation="relu", kernel_initializer="he_uniform")(b)
+
+        b = Conv2D(2, (1, 1), padding='same', activation="linear", kernel_initializer=winit, kernel_constraint=unit_norm(),
+                   kernel_regularizer="l1")(inputs)
+        b = Dropout(0.2)(b)
+        b = BatchNormalization()(b)
+        b = Conv2D(8, (3, 3), padding='same', activation="relu", kernel_initializer=winit, kernel_constraint=unit_norm(),
+                   kernel_regularizer="l1")(b)
+        b = Dropout(0.25)(b)
+        b = BatchNormalization()(b)
+        # b = SimpleRNN(4)(b)
+        b = Dense(2, activation="relu", kernel_initializer=winit, kernel_constraint=unit_norm())(b)
+        b = Flatten()(b)
+
+        b = ELU()(b)
 
 
 
-        d = keras.layers.concatenate([a, b], axis=1)
-        d = LeakyReLU(alpha=0.3)(d)
-        d = Dense(25, activation="relu", kernel_initializer="he_uniform")(d)
-        d = LeakyReLU(alpha=0.3)(d)
-        d = Dense(19, activation="relu", kernel_initializer="he_uniform")(d)
-        d = LeakyReLU(alpha=0.3)(d)
-        d = Dense(6, activation="relu", kernel_initializer="he_uniform")(d)
-        d = LeakyReLU(alpha=0.3)(d)
-        d = Dense(6, activation="relu", kernel_initializer="he_uniform")(d)
-        d = LeakyReLU(alpha=0.3)(d)
-        d = Dense(6 , activation="relu", kernel_initializer="he_uniform")(d)
-        d = LeakyReLU(alpha=0.3)(d)
-        #d = Dense(5, activation="relu", kernel_initializer="he_uniform")(d)
-        d = Flatten()(d)
-        outputs = Dense(1, activation="sigmoid", kernel_initializer="he_uniform")(d)
+        c = Conv2D(2, (1, 1), padding='same', activation="linear", kernel_initializer=winit, kernel_constraint=unit_norm(),
+                   kernel_regularizer="l1")(inputs)
+        c = Dropout(0.2)(c)
+        c = BatchNormalization()(c)
+        c = Conv2D(5, (3, 5), padding='same', activation="linear", kernel_initializer=winit, kernel_constraint=unit_norm(),
+                   kernel_regularizer="l1")(c)
+        c = Conv2D(8, (3, 5), padding='same', activation="relu", kernel_initializer=winit,
+                   kernel_constraint=unit_norm(),
+                   kernel_regularizer="l1")(c)
+        c = Dropout(0.25)(c)
+        c = BatchNormalization()(c)
+        c = ELU()(c)
+        c = Dense(2, activation="relu", kernel_initializer=winit, kernel_constraint=unit_norm())(c)
+        c = Flatten()(c)
+
+
+
+        e = MaxPooling2D(pool_size=(3, 2),strides = (2, 3), padding = 'same')(inputs)
+        e = Conv2D(2, (1, 1), padding='same', activation="linear", kernel_initializer=winit,
+                   kernel_constraint=unit_norm(),
+                   kernel_regularizer="l1")(e)
+        e = Dropout(0.4)(e)
+        e = BatchNormalization()(e)
+        e = Dense(2, activation="relu", kernel_initializer=winit, kernel_constraint=unit_norm())(e)
+        e = Flatten()(e)
+        e = ELU()(e)
+
+
+
+
+
+
+
+        d = keras.layers.concatenate([a,b,c,e], axis=1)
+
+
+        # d = UpSampling1D(size=2)(d)
+        # d = GaussianDropout(0.1)(d)
+        d = GaussianNoise(0.1)(d)
+        d = BatchNormalization()(d)
+        d = Dense(4,activation="relu", kernel_initializer=winit,kernel_constraint=unit_norm())(d)
+        d = BatchNormalization()(d)
+        d = Dense(4, activation="relu", kernel_initializer=winit, kernel_constraint=unit_norm())(d)
+        d = BatchNormalization()(d)
+        d = Dense(3, activation="relu", kernel_initializer=winit, kernel_constraint=unit_norm())(d)
+        # d = GaussianDropout(0.1)(d)
+        # d = BatchNormalization()(d)
+        # d = Dense(4, activation="relu", kernel_initializer="random_normal", kernel_constraint=unit_norm())(d)
+        # # d = GaussianDropout(0.1)(d)
+        # d = BatchNormalization()(d)
+        # d = Dense(4, activation="relu", kernel_initializer="random_normal", kernel_constraint=unit_norm())(d)
+        # d = BatchNormalization()(d)
+        # d = Dense(4, activation="relu", kernel_initializer="random_normal", kernel_constraint=unit_norm())(d)
+        # d = BatchNormalization()(d)
+
+        outputs = Dense(1, activation="sigmoid", kernel_initializer=winit,kernel_constraint=unit_norm())(d)
+        # outputs = LeakyReLU()(d)
 
 
 
 
         model = keras.Model(inputs=inputs, outputs=outputs)
-        model.compile(optimizer=optimizer, loss=lossf, metrics=["accuracy"])
+        model.compile(optimizer=optimizer, loss="binary_crossentropy", metrics=["accuracy"])
         model.summary()
         return model
 
@@ -146,15 +209,10 @@ class NeuralNetDefiner:
         print("fit model")
 
         predictors = data
-
-        predictor_scaler = MinMaxScaler(feature_range=(0, 1)).fit(predictors)
-        predictors = predictor_scaler.transform(predictors)
-
-        # predictor_scaler = StandardScaler().fit(predictors)
-        # predictors = predictor_scaler.transform(predictors)
-
-        # print(data.target.values)
         print(predictors[1])
+
+
+
 
         # I create a callback list for potential callbacks i might want.
         callbacks = []
@@ -174,18 +232,15 @@ class NeuralNetDefiner:
         print("fit model")
         predictors = data.drop(["id"], axis=1)
         predictors = predictors.drop(["target"], axis=1).to_numpy()  # .as_matrix()
-        # targets = to_categorical(data.target)
 
-        # predictor_scaler = StandardScaler().fit(predictors)
-        # predictors = predictor_scaler.transform(predictors)
-
-        predictor_scaler = MinMaxScaler().fit(predictors)
-        predictors = predictor_scaler.transform(predictors)
 
         print(data.target.values)
         print(predictors[1])
-        # print(predictors.to_numpy())
         print(predictors)
+
+        num_rows, num_cols = predictors.shape
+
+        predictors = np.reshape(predictors , (num_rows,4096,3))
 
         # I create a callback list for potential callbacks i might want.
         callbacks = []
@@ -195,7 +250,7 @@ class NeuralNetDefiner:
             callbacks = [EarlyStopping(patience=use_early_stopping_time, monitor="val_accuracy")]
 
         mt = model.fit(predictors, data.target, epochs=epochs, batch_size=batch_size,
-                       validation_split=0.25, callbacks=callbacks)  #
+                       validation_split=0.25, callbacks=callbacks)
 
         mlist = [mt]
         return mt, model

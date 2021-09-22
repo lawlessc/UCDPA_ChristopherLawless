@@ -124,7 +124,7 @@ class GridSearcher:
         # gpu_options = tf.GPUOptions(allow_growth=True)
         # session = tf.InteractiveSession(config=tf.ConfigProto(gpu_options=gpu_options))
         print("keras data type" + tf.keras.backend.floatx())
-        tf.device("cpu:0")  # I added this try rule out GPU issues
+       # tf.device("cpu:0")  # I added this try rule out GPU issues
 
         model = KerasClassifier(build_fn=self.neuralnet_d.create_autoencoder)
 

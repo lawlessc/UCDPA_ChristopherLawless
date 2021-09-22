@@ -7,7 +7,7 @@ import pandas as pd
 def import_training_targets():
     """running this imports a dataframe of all the  training sample ID's and their target values"""
     #print("import_training_targets")
-    targets_df =  pd.read_csv("data/training_labels.csv")
+    targets_df =  pd.read_csv("data/training_labels.csv",dtype={"id": "string", "target": float} ,low_memory=False,delimiter=",")
     #IDS_AND_TARGETS = targets_df
     #print(type(targets_df))
     #print(targets_df.shape)
@@ -18,7 +18,7 @@ def import_training_targets():
 def import_negative_training_targets():
     """running this imports a dataframe of all the  training sample ID's and their target values"""
     #print("import_training_targets")
-    targets_df =  pd.read_csv("data/training_labels_no_blackholes.csv")
+    targets_df =  pd.read_csv("data/training_labels_no_blackholes.csv",low_memory=False,delimiter=',')
     #IDS_AND_TARGETS = targets_df
     #print(type(targets_df))
     #print(targets_df.shape)
@@ -29,7 +29,7 @@ def import_negative_training_targets():
 def import_positive_training_targets():
     """running this imports a dataframe of all the  training sample ID's and their target values"""
     #print("import_training_targets")
-    targets_df =  pd.read_csv("data/training_labels_with_blackholes.csv")
+    targets_df =  pd.read_csv("data/training_labels_with_blackholes.csv",low_memory=False,delimiter=',')
     #IDS_AND_TARGETS = targets_df
     #print(type(targets_df))
     #print(targets_df.shape)
