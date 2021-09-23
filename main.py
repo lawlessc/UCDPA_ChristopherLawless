@@ -33,31 +33,30 @@ print('Made by Christopher Lawless July 2021')
 #ex.analysis_of_targets()
 #ex.analysis_of_data()
 #ex.analysis_of_signal()
-
-# samples.import_test()
+#samples.import_test()
 
 # For large amounts of data beyond 10,000 this can take a while to load
 # If you haven't downloaded the data via Kaggle you will only have 154 samples to use starting at 0
 
 
 
-rs = RandomState(seed=42)
+rs = RandomState(seed=6864)
 
-# data = samples.import_positive_flat_samples_add_targets(0,18000)
+# data = samples.import_positive_flat_samples_add_targets(0,19000)
 # data = samples.import_negative_flat_samples_add_targets(0,8000)
 # gc.collect()
-gc.collect()
-model = nn.load_model("models/transferlearner1.h5")
 
-data = samples.import_flat_samples_add_targets(0, 29000)
+# model = nn.load_model("models/transferlearner3.h5")
+
+data = samples.import_flat_samples_add_targets(0, 39000)
 
 
-data = data.append(samples.import_many_zeros(50))
-data = data.append(samples.import_many_rand(50))
-data = data.append(samples.import_many_ones(50))
+#data = data.append(samples.import_many_zeros(50))
+#data = data.append(samples.import_many_rand(50))
+#data = data.append(samples.import_many_ones(50))
 data = data.sample(frac=1 , random_state=rs).reset_index(drop=True)
 
-# print(data)
+print(data)
 
 
 #data_pos = samples.import_positive_flat_samples_add_targets(0,5192)
@@ -90,8 +89,8 @@ data = data.sample(frac=1 , random_state=rs).reset_index(drop=True)
 #gs.do_auto_encoder_search(data_neg,describe=True)
 # This does my own attempt at building a hyperameter tuning.
 hypo_trainer = Hp.HyperParameterOpto()
-# hypo_trainer.train_network(data)
-hypo_trainer.train_loaded_network(data,model)
+hypo_trainer.train_network(data)
+# hypo_trainer.train_loaded_network(data,model)
 #hypo_trainer.train_auto_encoder_network(pcapos)
 
 # This does PCA

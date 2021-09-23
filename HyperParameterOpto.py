@@ -28,7 +28,7 @@ class HyperParameterOpto:
 
         # opt = SGD(lr=0.01)
 
-        batch_sizes = [256]
+        batch_sizes = [400]
         seed_list = [69]
         hidden_layers = [1]
         hidden_layer_widths = [16]
@@ -48,7 +48,7 @@ class HyperParameterOpto:
 
                         model = self.neuralnet_d.create_model(optimizer="nadam",seed_num=seeds)
 
-                        history, model = self.neuralnet_d.fit_model(data=data, epochs=7, model=model,
+                        history, model = self.neuralnet_d.fit_model(data=data, epochs=122, model=model,
                                                                     batch_size=batch_size, use_early_stopping_time=0)
 
                         mlist = [history]
@@ -199,6 +199,18 @@ class HyperParameterOpto:
             self.neuralnet_d.save_model(model)
 
             #print("Predict")
+
+
+    def make_predictions(self, model,data):
+        predictors = data.drop(["id"], axis=1)
+        predictors = predictors.drop(["target"], axis=1).to_numpy()
+
+        num_rows, num_cols = predictors.shape
+        predictors = np.reshape(predictors, (num_rows, 4096, 3))
+        ynew = model.predict(predictors)
+
+        print(ynew)
+
 
 
 

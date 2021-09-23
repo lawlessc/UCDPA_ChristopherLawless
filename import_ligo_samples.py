@@ -24,9 +24,9 @@ def import_test():
     print(type(sample))
     print(sample.shape)
 
-    sample[0] = (sample[0] - np.min(sample[0])) / np.ptp(sample[0])
-    sample[1] = (sample[1] - np.min(sample[1])) / np.ptp(sample[1])
-    sample[2] = (sample[2] - np.min(sample[2])) / np.ptp(sample[2])
+    sample[0] = ((sample[0] - np.min(sample[0])) / np.ptp(sample[0])*2)-1
+    sample[1] = ((sample[1] - np.min(sample[1])) / np.ptp(sample[1])*2)-1
+    sample[2] = ((sample[2] - np.min(sample[2])) / np.ptp(sample[2])*2)-1
 
     signal_list = [sample[0, :], sample[1, :], sample[2, :]]
     vs.signal_plotter(signals_list=signal_list)
@@ -70,9 +70,9 @@ def import_flat_training_sample(sample_name):
     detector_readings = np.load(gp.get_path_training(sample_name), allow_pickle=True, fix_imports=True).astype(
         np.float32)  # Added these to make sure the data wasn't being loaded mangled somehow
 
-    detector_readings[0] = (detector_readings[0] - np.min(detector_readings[0])) / np.ptp(detector_readings[0])
-    detector_readings[1] = (detector_readings[1] - np.min(detector_readings[1])) / np.ptp(detector_readings[1])
-    detector_readings[2] = (detector_readings[2] - np.min(detector_readings[2])) / np.ptp(detector_readings[2])
+    detector_readings[0] = ((detector_readings[0] - np.min(detector_readings[0])) / np.ptp(detector_readings[0])*2)-1
+    detector_readings[1] = ((detector_readings[1] - np.min(detector_readings[1])) / np.ptp(detector_readings[1])*2)-1
+    detector_readings[2] = ((detector_readings[2] - np.min(detector_readings[2])) / np.ptp(detector_readings[2])*2)-1
 
     return detector_readings.flatten()
 

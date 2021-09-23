@@ -39,21 +39,18 @@ class NeuralNetDefiner:
 
         inputs = Input(shape=(4096,3,1))
 
+
         a = Conv2D(2, (1, 1), padding='same',activation="linear", kernel_initializer=winit,kernel_constraint=unit_norm(),
                    kernel_regularizer="l1")(inputs)
-        a = Conv2D(2, (2, 1), padding='same', activation="linear", kernel_initializer=winit,
+
+        a = Conv2D(9, (3, 1), padding='same', activation="linear", kernel_initializer=winit,
                    kernel_constraint=unit_norm(),
                    kernel_regularizer="l1")(a)
-        a = Conv2D(9, (3, 1), padding='same', activation="relu", kernel_initializer=winit,
-                   kernel_constraint=unit_norm(),
-                   kernel_regularizer="l1")(a)
-        a = Dropout(0.25)(a)
+        a = Dropout(0.2)(a)
         a = BatchNormalization()(a)
         a = ELU()(a)
-        # a = SimpleRNN(4)(a)
-        a = Dense(2, activation="relu", kernel_initializer=winit, kernel_constraint=unit_norm())(a)
+        a = Dense(2, activation="linear", kernel_initializer=winit, kernel_constraint=unit_norm())(a)
         a = Flatten()(a)
-        # a = Attention()(a)
 
 
 
@@ -61,12 +58,11 @@ class NeuralNetDefiner:
                    kernel_regularizer="l1")(inputs)
         b = Dropout(0.2)(b)
         b = BatchNormalization()(b)
-        b = Conv2D(8, (3, 3), padding='same', activation="relu", kernel_initializer=winit, kernel_constraint=unit_norm(),
+        b = Conv2D(8, (3, 3), padding='same', activation="linear", kernel_initializer=winit, kernel_constraint=unit_norm(),
                    kernel_regularizer="l1")(b)
-        b = Dropout(0.25)(b)
+        b = Dropout(0.2)(b)
         b = BatchNormalization()(b)
-        # b = SimpleRNN(4)(b)
-        b = Dense(2, activation="relu", kernel_initializer=winit, kernel_constraint=unit_norm())(b)
+        b = Dense(2, activation="linear", kernel_initializer=winit, kernel_constraint=unit_norm())(b)
         b = Flatten()(b)
 
         b = ELU()(b)
@@ -77,12 +73,10 @@ class NeuralNetDefiner:
                    kernel_regularizer="l1")(inputs)
         c = Dropout(0.2)(c)
         c = BatchNormalization()(c)
-        c = Conv2D(5, (3, 5), padding='same', activation="linear", kernel_initializer=winit, kernel_constraint=unit_norm(),
-                   kernel_regularizer="l1")(c)
-        c = Conv2D(8, (3, 5), padding='same', activation="relu", kernel_initializer=winit,
+        c = Conv2D(8, (3, 5), padding='same', activation="linear", kernel_initializer=winit,
                    kernel_constraint=unit_norm(),
                    kernel_regularizer="l1")(c)
-        c = Dropout(0.25)(c)
+        c = Dropout(0.2)(c)
         c = BatchNormalization()(c)
         c = ELU()(c)
         c = Dense(2, activation="relu", kernel_initializer=winit, kernel_constraint=unit_norm())(c)
@@ -90,48 +84,32 @@ class NeuralNetDefiner:
 
 
 
-        e = MaxPooling2D(pool_size=(3, 2),strides = (2, 3), padding = 'same')(inputs)
-        e = Conv2D(2, (1, 1), padding='same', activation="linear", kernel_initializer=winit,
-                   kernel_constraint=unit_norm(),
-                   kernel_regularizer="l1")(e)
-        e = Dropout(0.4)(e)
-        e = BatchNormalization()(e)
-        e = Dense(2, activation="relu", kernel_initializer=winit, kernel_constraint=unit_norm())(e)
-        e = Flatten()(e)
-        e = ELU()(e)
+        # e = MaxPooling2D(pool_size=(3, 2),strides = (2, 3), padding = 'same')(inputs)
+        # e = Conv2D(2, (1, 1), padding='same', activation="linear", kernel_initializer=winit,
+        #            kernel_constraint=unit_norm(),
+        #            kernel_regularizer="l1")(e)
+        # e = Dropout(0.4)(e)
+        # e = BatchNormalization()(e)
+        # e = Dense(2, activation="linear", kernel_initializer=winit, kernel_constraint=unit_norm())(e)
+        # e = Flatten()(e)
+        # e = ELU()(e)
+
+        d = keras.layers.concatenate([a,b,c], axis=1)
 
 
-
-
-
-
-
-        d = keras.layers.concatenate([a,b,c,e], axis=1)
-
-
-        # d = UpSampling1D(size=2)(d)
         # d = GaussianDropout(0.1)(d)
         d = GaussianNoise(0.1)(d)
         d = BatchNormalization()(d)
-        d = Dense(4,activation="relu", kernel_initializer=winit,kernel_constraint=unit_norm())(d)
-        d = BatchNormalization()(d)
-        d = Dense(4, activation="relu", kernel_initializer=winit, kernel_constraint=unit_norm())(d)
-        d = BatchNormalization()(d)
-        d = Dense(3, activation="relu", kernel_initializer=winit, kernel_constraint=unit_norm())(d)
+        d = Dense(4,activation="linear", kernel_initializer=winit,kernel_constraint=unit_norm())(d)
+        # d = BatchNormalization()(d)
+        # d = Dense(4, activation="linear", kernel_initializer=winit, kernel_constraint=unit_norm())(d)
+        # d = BatchNormalization()(d)
+        # d = Dense(4, activation="linear", kernel_initializer=winit, kernel_constraint=unit_norm())(d)
         # d = GaussianDropout(0.1)(d)
         # d = BatchNormalization()(d)
-        # d = Dense(4, activation="relu", kernel_initializer="random_normal", kernel_constraint=unit_norm())(d)
-        # # d = GaussianDropout(0.1)(d)
-        # d = BatchNormalization()(d)
-        # d = Dense(4, activation="relu", kernel_initializer="random_normal", kernel_constraint=unit_norm())(d)
-        # d = BatchNormalization()(d)
-        # d = Dense(4, activation="relu", kernel_initializer="random_normal", kernel_constraint=unit_norm())(d)
-        # d = BatchNormalization()(d)
 
-        outputs = Dense(1, activation="sigmoid", kernel_initializer=winit,kernel_constraint=unit_norm())(d)
+        outputs = Dense(1, activation="linear", kernel_initializer=winit,kernel_constraint=unit_norm())(d)
         # outputs = LeakyReLU()(d)
-
-
 
 
         model = keras.Model(inputs=inputs, outputs=outputs)

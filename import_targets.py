@@ -7,7 +7,7 @@ import pandas as pd
 def import_training_targets():
     """running this imports a dataframe of all the  training sample ID's and their target values"""
     #print("import_training_targets")
-    targets_df =  pd.read_csv("data/training_labels.csv",dtype={"id": "string", "target": float} ,low_memory=False,delimiter=",")
+    targets_df =  pd.read_csv("data/training_labels_labels_changed.csv",dtype={"id": "string", "target": float} ,low_memory=False,delimiter=",")
     #IDS_AND_TARGETS = targets_df
     #print(type(targets_df))
     #print(targets_df.shape)
