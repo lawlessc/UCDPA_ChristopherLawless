@@ -3,7 +3,9 @@ from keras.optimizers import SGD, Adam, Nadam
 import visualisers as vs
 import NeuralNetDefiner as Nnd
 import tensorflow as tf
-
+from keras.initializers import RandomUniform
+from keras.callbacks import LearningRateScheduler
+from keras.optimizers.schedules import CosineDecay,ExponentialDecay,PiecewiseConstantDecay
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 import os
 
@@ -11,6 +13,8 @@ import os
 
 class HyperParameterOpto:
     """This is a class for doing hyper parameter optimization"""
+
+
 
     best_model = None
     best_accuracy = None
@@ -21,20 +25,25 @@ class HyperParameterOpto:
         beats the previous models on improvement it saves that model """
 
         # # trying out optimizers with different set learning rates.
-        # lr_decayed_fn = tf.keras.optimizers.schedules.CosineDecay(initial_learning_rate=0.5, decay_steps=0)
+        #lr_decayed_fnc = CosineDecay(initial_learning_rate=0.9999, decay_steps=10)
+        lr_decayed_fne = ExponentialDecay(initial_learning_rate=2.4,decay_rate=0.00005,decay_steps=10000)
+        #lr_decayed_fnp = PiecewiseConstantDecay(l)
         # opto_ssg3 = SGD(learning_rate=lr_decayed_fn)
         # adam2 = Adam(learning_rate=lr_decayed_fn)
         # tf.device("cpu:0")
+        # az = Nadam(learning_rate=0.00001)
+        az = Adam(learning_rate=lr_decayed_fne)
 
         # opt = SGD(lr=0.01)
 
-        batch_sizes = [400]
-        seed_list = [69]
+        batch_sizes = [2000]
+        seed_list = [697]
         hidden_layers = [1]
         hidden_layer_widths = [16]
         # optimizer_list = ["nadam"]  # ,"adam",my_optimizer3,"sgd",my_optimizer4,my_optimizer5,
         # my_optimizer6,
         # my_optimizer7,my_optimizer8]
+        #init = RandomUniform(minval=0.01, maxval=1.5)
 
         for index, seeds in enumerate(seed_list):
             for batch_size in batch_sizes:
@@ -46,9 +55,9 @@ class HyperParameterOpto:
                         print("layers:" + str(layers + 1))  # added a number to this to include
                         print("batch size:" + str(batch_size))
 
-                        model = self.neuralnet_d.create_model(optimizer="nadam",seed_num=seeds)
+                        model = self.neuralnet_d.create_model(optimizer=az,seed_num=seeds,winit='glorot_uniform')
 
-                        history, model = self.neuralnet_d.fit_model(data=data, epochs=122, model=model,
+                        history, model = self.neuralnet_d.fit_model(data=data, epochs=400, model=model,
                                                                     batch_size=batch_size, use_early_stopping_time=0)
 
                         mlist = [history]
@@ -57,7 +66,9 @@ class HyperParameterOpto:
 
 
 
-                    self.set_best_model(history, model,data)
+                        self.set_best_model(history, model,data)
+
+
 
 
 
@@ -93,7 +104,7 @@ class HyperParameterOpto:
                         print("batch size:" + str(batch_size))
 
                         # model = self.neuralnet_d.create_model(optimizer=adam2,seed_num=seeds)
-                        model.compile(optimizer=az, loss='binary_crossentropy', metrics=["accuracy"])
+                        model.compile(optimizer="nadam", loss='binary_crossentropy', metrics=["accuracy"])
 
                         history, model = self.neuralnet_d.fit_model(data=data, epochs=120, model=model,
                                                                     batch_size=batch_size, use_early_stopping_time=0)
@@ -159,7 +170,7 @@ class HyperParameterOpto:
         self.neuralnet_d.save_model(model)
 
         num_rows, num_cols = predictors.shape
-        predictors = np.reshape(predictors, (num_rows, 4096, 3))
+        predictors = np.reshape(predictors, (num_rows, 3, 4096))
 
 
         ##predictors = data

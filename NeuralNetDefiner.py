@@ -5,15 +5,18 @@ import pandas as pd
 import numpy as np
 import tensorflow
 from keras.callbacks import EarlyStopping
-from keras.layers import Dense, Flatten, Conv1D, MaxPooling1D, AveragePooling1D,GlobalAveragePooling1D,GlobalMaxPooling1D, ELU, Attention ,SimpleRNN,GRU
-from keras.layers import Input, Dropout ,Reshape, Conv2D ,MaxPooling2D ,AveragePooling2D ,BatchNormalization,GaussianDropout,GaussianNoise , UpSampling1D, ConvLSTM2D
-from keras.layers.advanced_activations import LeakyReLU
+from keras.layers import Dense, Flatten, Conv1D, MaxPooling1D, AveragePooling1D, GlobalAveragePooling1D, \
+    GlobalMaxPooling1D, ELU, Attention, SimpleRNN, GRU
+from keras.layers import Input, Dropout, Reshape, Conv2D, MaxPooling2D, AveragePooling2D, BatchNormalization, \
+    GaussianDropout, GaussianNoise, UpSampling1D, ConvLSTM2D, Concatenate
+from keras.layers.advanced_activations import LeakyReLU, ReLU
 from keras.models import load_model, Sequential
 from keras.utils.np_utils import to_categorical
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 import visualisers as vs
 from keras import regularizers
-from keras.constraints import unit_norm
+from keras.constraints import unit_norm, min_max_norm
+from keras.callbacks import LearningRateScheduler
 
 
 # Made by Christopher Lawless July 2021
@@ -28,7 +31,7 @@ class NeuralNetDefiner:
 
     def create_model(self, first_layer=30, hidden_layers=1, max_pool_size=10, layer_widths=10, optimizer="sgd",
                      winit="glorot_uniform", cnn_window_size=30, dropout=0.01, decay=0.01, input_shape=(12288,),
-                     lossf='binary_crossentropy' ,seed_num=45):
+                     lossf='binary_crossentropy', seed_num=45):
         """function tales in the first layer width, dropout, decay, number or hidden layers and their width and the
         optimizer and initial weights this is mainly for use with GridSearchCV but can be used discretely if you just
         want a model """
@@ -36,81 +39,51 @@ class NeuralNetDefiner:
 
         tensorflow.random.set_seed(seed_num)
 
+        # mmnorm = min_max_norm(min_value=0.00001, max_value= 1.0)
 
-        inputs = Input(shape=(4096,3,1))
+        inputs = Input(shape=(3, 4096, 1))
 
+        # a = Conv2D(32, (1, 1), padding='same', activation="relu", kernel_initializer=winit,
+        #            kernel_regularizer="l1")(inputs)
+        #
+        # a = Conv2D(16, (3, 1), padding='same', activation="relu", kernel_initializer=winit,
+        #            kernel_regularizer="l1")(a)
+        # a = Dropout(0.2)(a)
+        # a = BatchNormalization()(a)
+        # a = Dense(5, activation="relu", kernel_initializer=winit)(a)
+        # # a = ReLU()(a)
+        # a = Flatten()(a)
+        #
+        # b = Conv2D(32, (1, 1), padding='same', activation="relu", kernel_initializer=winit,
+        #            kernel_regularizer="l2")(inputs)
+        # # b = Dropout(0.2)(b)
+        # b = BatchNormalization()(b)
+        # b = Conv2D(16, (3, 3), padding='same', activation="relu", kernel_initializer=winit,
+        #            kernel_regularizer="l2")(b)
+        # b = Dropout(0.2)(b)
+        # b = BatchNormalization()(b)
+        # b = Dense(5, activation="relu", kernel_initializer=winit)(b)
+        # # b = ReLU()(b)
+        # b = Flatten()(b)
 
-        a = Conv2D(2, (1, 1), padding='same',activation="linear", kernel_initializer=winit,kernel_constraint=unit_norm(),
-                   kernel_regularizer="l1")(inputs)
+        # b = ReLU()(b)
 
-        a = Conv2D(9, (3, 1), padding='same', activation="linear", kernel_initializer=winit,
-                   kernel_constraint=unit_norm(),
-                   kernel_regularizer="l1")(a)
-        a = Dropout(0.2)(a)
-        a = BatchNormalization()(a)
-        a = ELU()(a)
-        a = Dense(2, activation="linear", kernel_initializer=winit, kernel_constraint=unit_norm())(a)
-        a = Flatten()(a)
+        e = MaxPooling2D(pool_size=(2, 2), strides=(1, 1), padding='same')(inputs)
+        e = Dropout(0.2)(e)
+        e = BatchNormalization()(e)
+        e = Dense(2, activation="relu", kernel_initializer=winit)(e)
+        e = Flatten()(e)
 
+        f = MaxPooling2D(pool_size=(2, 2), strides=(1, 1), padding='same')(inputs)
+        f = Dropout(0.2)(f)
+        f = BatchNormalization()(f)
+        f = Dense(2, activation="relu", kernel_initializer=winit)(f)
+        f = Flatten()(f)
 
-
-        b = Conv2D(2, (1, 1), padding='same', activation="linear", kernel_initializer=winit, kernel_constraint=unit_norm(),
-                   kernel_regularizer="l1")(inputs)
-        b = Dropout(0.2)(b)
-        b = BatchNormalization()(b)
-        b = Conv2D(8, (3, 3), padding='same', activation="linear", kernel_initializer=winit, kernel_constraint=unit_norm(),
-                   kernel_regularizer="l1")(b)
-        b = Dropout(0.2)(b)
-        b = BatchNormalization()(b)
-        b = Dense(2, activation="linear", kernel_initializer=winit, kernel_constraint=unit_norm())(b)
-        b = Flatten()(b)
-
-        b = ELU()(b)
-
-
-
-        c = Conv2D(2, (1, 1), padding='same', activation="linear", kernel_initializer=winit, kernel_constraint=unit_norm(),
-                   kernel_regularizer="l1")(inputs)
-        c = Dropout(0.2)(c)
-        c = BatchNormalization()(c)
-        c = Conv2D(8, (3, 5), padding='same', activation="linear", kernel_initializer=winit,
-                   kernel_constraint=unit_norm(),
-                   kernel_regularizer="l1")(c)
-        c = Dropout(0.2)(c)
-        c = BatchNormalization()(c)
-        c = ELU()(c)
-        c = Dense(2, activation="relu", kernel_initializer=winit, kernel_constraint=unit_norm())(c)
-        c = Flatten()(c)
-
-
-
-        # e = MaxPooling2D(pool_size=(3, 2),strides = (2, 3), padding = 'same')(inputs)
-        # e = Conv2D(2, (1, 1), padding='same', activation="linear", kernel_initializer=winit,
-        #            kernel_constraint=unit_norm(),
-        #            kernel_regularizer="l1")(e)
-        # e = Dropout(0.4)(e)
-        # e = BatchNormalization()(e)
-        # e = Dense(2, activation="linear", kernel_initializer=winit, kernel_constraint=unit_norm())(e)
-        # e = Flatten()(e)
-        # e = ELU()(e)
-
-        d = keras.layers.concatenate([a,b,c], axis=1)
-
-
-        # d = GaussianDropout(0.1)(d)
-        d = GaussianNoise(0.1)(d)
+        d = Concatenate([e,f],axis=1)
         d = BatchNormalization()(d)
-        d = Dense(4,activation="linear", kernel_initializer=winit,kernel_constraint=unit_norm())(d)
-        # d = BatchNormalization()(d)
-        # d = Dense(4, activation="linear", kernel_initializer=winit, kernel_constraint=unit_norm())(d)
-        # d = BatchNormalization()(d)
-        # d = Dense(4, activation="linear", kernel_initializer=winit, kernel_constraint=unit_norm())(d)
-        # d = GaussianDropout(0.1)(d)
-        # d = BatchNormalization()(d)
 
-        outputs = Dense(1, activation="linear", kernel_initializer=winit,kernel_constraint=unit_norm())(d)
-        # outputs = LeakyReLU()(d)
-
+        outputs = Dense(1, activation="sigmoid", kernel_initializer=winit)(d)
 
         model = keras.Model(inputs=inputs, outputs=outputs)
         model.compile(optimizer=optimizer, loss="binary_crossentropy", metrics=["accuracy"])
@@ -127,7 +100,7 @@ class NeuralNetDefiner:
         model = Sequential()
 
         # model.add(Reshape((4096, 3), input_shape=(12288,)))
-        model.add(Dense(55, activation="sigmoid", kernel_initializer=winit, input_shape=(55,)))
+        model.add(Dense(55, activation="linear", kernel_initializer=winit, input_shape=(55,)))
         #  model.add(LeakyReLU(55, input_shape=(55,)))
         # model.add(Dropout(dropout))
 
@@ -187,10 +160,7 @@ class NeuralNetDefiner:
         print("fit model")
 
         predictors = data
-        print(predictors[1])
-
-
-
+        print(predictors[0])
 
         # I create a callback list for potential callbacks i might want.
         callbacks = []
@@ -205,33 +175,61 @@ class NeuralNetDefiner:
         mlist = [mt]
         return mt, model
 
+
+
     def fit_model(self, data, epochs, model, batch_size, use_early_stopping_time=0):
         """Takes in data, epochs, a keras model and batch_size, and if early stopping is to be used."""
         print("fit model")
         predictors = data.drop(["id"], axis=1)
         predictors = predictors.drop(["target"], axis=1).to_numpy()  # .as_matrix()
 
-
-        print(data.target.values)
-        print(predictors[1])
-        print(predictors)
-
+        # print(data.target.values)
+        # print(predictors[1])
+        # print(predictors)
+        #print("showing")
+        print(predictors[0])
         num_rows, num_cols = predictors.shape
 
-        predictors = np.reshape(predictors , (num_rows,4096,3))
+        predictors = np.reshape(predictors, (num_rows, 3, 4096))
+        #print("showing")
+        #print(predictors[0])
+
+        # print(predictors[1])
+        # print(predictors)
 
         # I create a callback list for potential callbacks i might want.
         callbacks = []
+
+        # def lr_scheduler(epoch, lr=1.0):
+        #     decay_rate = 0.1
+        #     decay_step = 10
+        #     if epoch % decay_step == 0 and epoch:
+        #         return lr * decay_rate
+        #     return lr
+
+
+       # lr= lr_scheduler(10,5.0)
+
+
+        #callbacks = [LearningRateScheduler(schedule=lr, verbose=1)]
 
         # This inserts a an early stopping monitor into callbacks with a set time.
         if use_early_stopping_time > 0:
             callbacks = [EarlyStopping(patience=use_early_stopping_time, monitor="val_accuracy")]
 
-        mt = model.fit(predictors, data.target, epochs=epochs, batch_size=batch_size,
-                       validation_split=0.25, callbacks=callbacks)
+        #print("type")
+        #print(type(data.target[0]))
+        #print("type")
+        targets = np.float32(data.target)
+        print(type(targets[0]))
+
+        mt = model.fit(predictors, targets, epochs=epochs, batch_size=batch_size,
+                       validation_split=0.25)
 
         mlist = [mt]
         return mt, model
+
+
 
     def save_model(self, model):
         """This saves a model to the models folder with date and time as the filename"""

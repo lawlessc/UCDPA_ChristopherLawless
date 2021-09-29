@@ -40,7 +40,7 @@ print('Made by Christopher Lawless July 2021')
 
 
 
-rs = RandomState(seed=6864)
+rs = RandomState(seed=69)
 
 # data = samples.import_positive_flat_samples_add_targets(0,19000)
 # data = samples.import_negative_flat_samples_add_targets(0,8000)
@@ -48,12 +48,12 @@ rs = RandomState(seed=6864)
 
 # model = nn.load_model("models/transferlearner3.h5")
 
-data = samples.import_flat_samples_add_targets(0, 39000)
+data = samples.import_flat_samples_add_targets(0, 40000)
 
 
-#data = data.append(samples.import_many_zeros(50))
-#data = data.append(samples.import_many_rand(50))
-#data = data.append(samples.import_many_ones(50))
+data = data.append(samples.import_many_zeros(8))
+data = data.append(samples.import_many_rand(8))
+data = data.append(samples.import_many_ones(8))
 data = data.sample(frac=1 , random_state=rs).reset_index(drop=True)
 
 print(data)

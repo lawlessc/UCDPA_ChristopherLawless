@@ -14,8 +14,9 @@ from keras.utils.np_utils import to_categorical
 from sklearn.decomposition import PCA
 from tensorflow.keras import mixed_precision
 from datetime import datetime
-
+from keras.optimizers.schedules import CosineDecay,ExponentialDecay,PiecewiseConstantDecay
 import NeuralNetDefiner as Nnd
+
 
 
 class GridSearcher:
@@ -39,27 +40,49 @@ class GridSearcher:
         tf.keras.backend.set_floatx("float32")  # I did this because the Ligo Data are 64 bit floats.
         print("keras data type" + tf.keras.backend.floatx())
         # tf.device("cpu:0")#I added this try rule out GPU issues
+        ##TF_GPU_ALLOCATOR = cuda_malloc_async
+
+       ##tf.de
 
         model = KerasClassifier(build_fn=self.neuralnet_d.create_model)
         # opto_ssg1 = SGD(learning_rate=0.000001)
 
         # decay_steps = 1000
-        lr_decayed_fn = tf.keras.optimizers.schedules.CosineDecay(initial_learning_rate=0.999, decay_steps=1000)
+        #lr_decayed_fnc = CosineDecay(initial_learning_rate=0.9999, decay_steps=10)
+        lr_decayed_fnea = ExponentialDecay(initial_learning_rate=1.2, decay_rate=0.001, decay_steps=1000)
+        lr_decayed_fneb = ExponentialDecay(initial_learning_rate=1.2, decay_rate=0.001, decay_steps=1)
+        lr_decayed_fnc = ExponentialDecay(initial_learning_rate=1.2, decay_rate=0.001, decay_steps=10)
+        lr_decayed_fnd = ExponentialDecay(initial_learning_rate=1.2, decay_rate=0.001, decay_steps=100)
+        #lr_decayed_fnp = PiecewiseConstantDecay(l)
+        # opto_ssg3 = SGD(learning_rate=lr_decayed_fn)
+        # adam2 = Adam(learning_rate=lr_decayed_fn)
+        # tf.device("cpu:0")
+        # az = Nadam(learning_rate=0.00001)
+        #ac = Adam(learning_rate=lr_decayed_fnc)
+        aa = Adam(learning_rate=lr_decayed_fnea)
+        ab = Adam(learning_rate=lr_decayed_fneb)
+        ac = Adam(learning_rate=lr_decayed_fnc)
+        ad = Adam(learning_rate=lr_decayed_fnd)
+        #print("Optimizer1:" + str(ac))
+        print("Optimizer2:" + str(aa))
+        print("Optimizer2:" + str(ab))
+        print("Optimizer2:" + str(ac))
+        print("Optimizer2:" + str(ad))
+        #ap = Adam(learning_rate=lr_decayed_fnc)
 
-        opto_ssg2 = SGD(learning_rate=0.0000001, )
-        opto_ssg3 = SGD(learning_rate=lr_decayed_fn)
+
 
         early_stopping = EarlyStopping(monitor='loss', patience=3)
 
-        param_grid = {"epochs": [13],
+        param_grid = {"epochs": [29],
                       "first_layer": [10],
                       "hidden_layers": [4],
                       "layer_widths": [12],
                       "cnn_window_size": [31],
                       "max_pool_size": [10],
-                      "optimizer": [opto_ssg3],
-                      "winit": ["random_uniform"],
-                      "batch_size": [150],
+                      "optimizer": [aa,ab,ac,ad],
+                      "winit": ["glorot_uniform"],
+                      "batch_size": [350],
                       "dropout": [0.70],
                       "decay": [0.01],
                       "lossf": ["binary_crossentropy"]
@@ -70,18 +93,20 @@ class GridSearcher:
 
         # targets = to_categorical(data.target.to_numpy())
 
-        np.set_printoptions(threshold=np.inf)
+        #np.set_printoptions(threshold=np.inf)
 
         # print("predictors" + str(predictors))
         # print("---------------------------------------------------------------")
         # print("targets" + str(targets))
+        num_rows, num_cols = predictors.shape
+        predictors = np.reshape(predictors, (num_rows, 3, 4096))
 
         X_train, X_test, y_train, y_test = train_test_split(predictors, data.target.to_numpy(),
                                                             shuffle=False)  # test sets are empty
         # because i am testing with cross validation in gridsearch
 
-        predictor_scaler = MinMaxScaler().fit(X_train)
-        X_train = predictor_scaler.transform(X_train)
+        # predictor_scaler = MinMaxScaler().fit(X_train)
+        # X_train = predictor_scaler.transform(X_train)
 
         #predictor_scaler = StandardScaler().fit(X_train)
         # StandardScaler.set_params(with_mean=False)
@@ -94,9 +119,9 @@ class GridSearcher:
         #
         # I am printing these because Gridsearch does not output their instance names
         # but only outputs their memory location e.g "0x000001FBDE926B70"
-        # print("Optimizer1:" + str(opto_ssg1))
-        print("Optimizer2:" + str(opto_ssg2))
-        print("Optimizer3:" + str(opto_ssg3))
+        #print("Optimizer1:" + str(ac))
+        print("Optimizer2:" + str(ae))
+        #print("Optimizer3:" + str(ap))
 
     def do_auto_encoder_search(self, data, describe=False):
         """This takes a  single dataframe as input and does a gridsearch , you can also set it to print information
@@ -149,7 +174,7 @@ class GridSearcher:
                       "cnn_window_size": [100],
                       "max_pool_size": [1000],
                       "optimizer": [Adam(lr=0.0005)],
-                      "winit": ["random_uniform","gl_uniform"],
+                      "winit": ["gl_uniform"],
                       "batch_size": [512],
                       "dropout": [0.20],
                       "lossf": ["mean_squared_error"],#"kl_divergence","binary_crossentropy",

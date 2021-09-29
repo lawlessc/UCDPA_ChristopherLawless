@@ -24,9 +24,9 @@ def import_test():
     print(type(sample))
     print(sample.shape)
 
-    sample[0] = ((sample[0] - np.min(sample[0])) / np.ptp(sample[0])*2)-1
-    sample[1] = ((sample[1] - np.min(sample[1])) / np.ptp(sample[1])*2)-1
-    sample[2] = ((sample[2] - np.min(sample[2])) / np.ptp(sample[2])*2)-1
+    sample[0] = (sample[0] - np.min(sample[0])) / np.ptp(sample[0])
+    sample[1] = (sample[1] - np.min(sample[1])) / np.ptp(sample[1])
+    sample[2] = (sample[2] - np.min(sample[2])) / np.ptp(sample[2])
 
     signal_list = [sample[0, :], sample[1, :], sample[2, :]]
     vs.signal_plotter(signals_list=signal_list)
@@ -67,12 +67,19 @@ def import_flat_training_sample(sample_name):
     numpy array of lenght 12288 """
     # samples names are hex numbers in the targets file
     # The first 3 also represent the path characters represent
-    detector_readings = np.load(gp.get_path_training(sample_name), allow_pickle=True, fix_imports=True).astype(
-        np.float32)  # Added these to make sure the data wasn't being loaded mangled somehow
+    detector_readings = np.load(gp.get_path_training(sample_name)).astype(np.float32)  # Added these to make sure the
+    # data wasn't being loaded mangled somehow
 
-    detector_readings[0] = ((detector_readings[0] - np.min(detector_readings[0])) / np.ptp(detector_readings[0])*2)-1
-    detector_readings[1] = ((detector_readings[1] - np.min(detector_readings[1])) / np.ptp(detector_readings[1])*2)-1
-    detector_readings[2] = ((detector_readings[2] - np.min(detector_readings[2])) / np.ptp(detector_readings[2])*2)-1
+    detector_readings[0] = (detector_readings[0] - np.min(detector_readings[0])) / np.ptp(detector_readings[0])
+    detector_readings[1] = (detector_readings[1] - np.min(detector_readings[1])) / np.ptp(detector_readings[1])
+    detector_readings[2] = (detector_readings[2] - np.min(detector_readings[2])) / np.ptp(detector_readings[2])
+
+    detector_readings = np.float32(detector_readings)
+
+
+    # detector_readings[0] = (detector_readings[0] - np.mean(detector_readings[0])) / (np.std(detector_readings[0]))
+    # detector_readings[1] = (detector_readings[1] - np.mean(detector_readings[1])) / (np.std(detector_readings[1]))
+    # detector_readings[2] = (detector_readings[2] - np.mean(detector_readings[2])) / (np.std(detector_readings[2]))
 
     return detector_readings.flatten()
 
@@ -128,6 +135,7 @@ def import_flat_samples_add_targets(starting_number, ending_number):
     for entry in range(starting_number, ending_number):
         sample_name_list.append(targets_df["id"].values[entry])
         target_list.append(float(targets_df["target"].values[entry]))
+
 
     samples_df = import_list_of_flat_training_samples(sample_name_list)
     samples_df["target"] = target_list
