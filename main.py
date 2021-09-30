@@ -48,7 +48,7 @@ rs = RandomState(seed=69)
 
 # model = nn.load_model("models/transferlearner3.h5")
 
-data = samples.import_flat_samples_add_targets(0, 40000)
+data = samples.import_flat_samples_add_targets(0, 42100)
 
 
 data = data.append(samples.import_many_zeros(8))

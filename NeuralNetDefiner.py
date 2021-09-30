@@ -71,16 +71,16 @@ class NeuralNetDefiner:
         e = MaxPooling2D(pool_size=(2, 2), strides=(1, 1), padding='same')(inputs)
         e = Dropout(0.2)(e)
         e = BatchNormalization()(e)
-        e = Dense(2, activation="relu", kernel_initializer=winit)(e)
+        e = Dense(3, activation="relu", kernel_initializer=winit)(e)
         e = Flatten()(e)
 
         f = MaxPooling2D(pool_size=(2, 2), strides=(1, 1), padding='same')(inputs)
         f = Dropout(0.2)(f)
         f = BatchNormalization()(f)
-        f = Dense(2, activation="relu", kernel_initializer=winit)(f)
+        f = Dense(3, activation="relu", kernel_initializer=winit)(f)
         f = Flatten()(f)
 
-        d = Concatenate([e,f],axis=1)
+        d = Concatenate(axis=1)([e,f])
         d = BatchNormalization()(d)
 
         outputs = Dense(1, activation="sigmoid", kernel_initializer=winit)(d)

@@ -26,7 +26,7 @@ class HyperParameterOpto:
 
         # # trying out optimizers with different set learning rates.
         #lr_decayed_fnc = CosineDecay(initial_learning_rate=0.9999, decay_steps=10)
-        lr_decayed_fne = ExponentialDecay(initial_learning_rate=2.4,decay_rate=0.00005,decay_steps=10000)
+        lr_decayed_fne = ExponentialDecay(initial_learning_rate=2.9,decay_rate=0.00005,decay_steps=10000)
         #lr_decayed_fnp = PiecewiseConstantDecay(l)
         # opto_ssg3 = SGD(learning_rate=lr_decayed_fn)
         # adam2 = Adam(learning_rate=lr_decayed_fn)
@@ -36,7 +36,7 @@ class HyperParameterOpto:
 
         # opt = SGD(lr=0.01)
 
-        batch_sizes = [2000]
+        batch_sizes = [1500]
         seed_list = [697]
         hidden_layers = [1]
         hidden_layer_widths = [16]
@@ -57,7 +57,7 @@ class HyperParameterOpto:
 
                         model = self.neuralnet_d.create_model(optimizer=az,seed_num=seeds,winit='glorot_uniform')
 
-                        history, model = self.neuralnet_d.fit_model(data=data, epochs=400, model=model,
+                        history, model = self.neuralnet_d.fit_model(data=data, epochs=1100, model=model,
                                                                     batch_size=batch_size, use_early_stopping_time=0)
 
                         mlist = [history]
@@ -121,7 +121,7 @@ class HyperParameterOpto:
         """This is function takes in pandas dataframe and performs hyper parameter optimization, everytime a model
         beats the previous models on improvement it saves that model """
 
-        lr_decayed_fn = tf.keras.optimizers.schedules.CosineDecay(initial_learning_rate=0.99999, decay_steps=200)
+        lr_decayed_fn = tf.keras.optimizers.schedules.CosineDecay(initial_learning_rate=1.1, decay_steps=200)
         opto_ssg3 = SGD(learning_rate=lr_decayed_fn)
 
         batch_sizes = [600]
